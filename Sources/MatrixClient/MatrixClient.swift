@@ -33,7 +33,7 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     /// ```
     public func getVersions() async throws -> MatrixServerInfo {
-        return try await request("/_matrix/client/versions", withAuthorization: false, forType: MatrixServerInfo.self)
+        return try await MatrixServerInfoRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
     
     /// Gets discovery information about the domain. The file may include additional keys, which MUST follow the Java package naming convention,
@@ -46,7 +46,7 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     ///```
     public func getWellKnown() async throws -> MatrixWellKnown {
-        return try await request("/.well-known/matrix/client", withAuthorization: false, forType: MatrixWellKnown.self)
+        return try await MatrixWellKnownRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
     
     /// Gets the homeserver's supported login types to authenticate users. Clients should pick one of these and supply it as the type when logging in.

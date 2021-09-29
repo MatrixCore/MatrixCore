@@ -21,9 +21,29 @@ public struct MatrixHomeserver: Codable {
         
         self.url = components
     }
+    
+    public func path(_ path: String) -> URLComponents {
+        var components = url
+        components.path = path
+        return components;
+    }
 }
 
-public struct MatrixServerInfo: Codable {
+public struct MatrixServerInfoRequest: MatrixRequest {
+    public typealias Response = MatrixServerInfo
+    
+    public typealias URLParameters = ()
+    
+    public func path(with parameters: ()) -> String {
+        return "/_matrix/client/versions"
+    }
+    
+    public static var httpMethod = "GET"
+    
+    public static var requiresAuth = false
+}
+
+public struct MatrixServerInfo: MatrixResponse {
     /// The supported versions.
     public var versions: [String]
     
@@ -37,7 +57,21 @@ public struct MatrixServerInfo: Codable {
     }
 }
 
-public struct MatrixWellKnown {
+public struct MatrixWellKnownRequest: MatrixRequest {
+    public typealias Response = MatrixWellKnown
+    
+    public typealias URLParameters = ()
+    
+    public func path(with parameters: ()) -> String {
+        return "/.well-known/matrix/client"
+    }
+    
+    public static var httpMethod = "GET"
+    
+    public static var requiresAuth = false
+}
+
+public struct MatrixWellKnown: MatrixResponse {
     /// Used by clients to discover homeserver information.
     public var homeserver: ServerInformation?
     
@@ -67,7 +101,6 @@ public struct MatrixWellKnown {
     }
 }
 
-// TODO: encode for extraInfos
 extension MatrixWellKnown: Codable {
     private enum KnownCodingKeys: String, CodingKey, CaseIterable {
         case homeserver = "m.homeserver"
