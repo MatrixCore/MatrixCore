@@ -191,7 +191,7 @@ public enum MatrixLoginUserIdentifier: Codable {
     }
 }
 
-public struct MatrixLoginRequest: Codable {
+public struct MatrixLoginRequest {
     /// The login type being used. One of: ["m.login.password", "m.login.token"]
     public var type: String
     
@@ -236,7 +236,21 @@ public struct MatrixLoginRequest: Codable {
     }
 }
 
-public struct MatrixLoginResponse: Codable {
+extension MatrixLoginRequest: MatrixRequest {
+    public typealias Response = MatrixLogin
+    
+    public typealias URLParameters = ()
+    
+    public func path(with parameters: ()) -> String {
+        return "/_matrix/client/r0/login"
+    }
+    
+    public static var httpMethod = HttpMethode.POST
+    
+    public static var requiresAuth = false
+}
+
+public struct MatrixLogin: MatrixResponse {
     /// The fully-qualified Matrix ID that has been registered.
     public var userId: String?
     
