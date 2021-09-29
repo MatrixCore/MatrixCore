@@ -7,13 +7,22 @@
 
 import Foundation
 
+public enum HttpMethode: String, CaseIterable {
+    case GET = "GET"
+    case POST = "POST"
+    case PUT = "PUT"
+    case PATCH = "PATCH"
+    
+    static var containsBoddy: [Self] = [ .POST, .PUT, .PATCH ]
+}
+
 public protocol MatrixRequest: Codable {
     associatedtype Response: MatrixResponse
     
     associatedtype URLParameters
     func path(with parameters: URLParameters) -> String
     
-    static var httpMethod: String { get }
+    static var httpMethod: HttpMethode { get }
     static var requiresAuth: Bool { get }
     // TODO: rate limited property?
 }
@@ -32,8 +41,8 @@ public extension MatrixRequest {
             urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        urlRequest.httpMethod = Self.httpMethod
-        if ["POST", "PUT", "PATCH"].contains(Self.httpMethod) {
+        urlRequest.httpMethod = Self.httpMethod.rawValue
+        if HttpMethode.containsBoddy.contains(Self.httpMethod) {
             urlRequest.httpBody = try? JSONEncoder().encode(self)
         }
         

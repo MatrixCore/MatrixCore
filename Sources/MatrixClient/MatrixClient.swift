@@ -56,64 +56,9 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     /// ```
     public func getLoginFlows() async throws -> [MatrixLoginFlow] {
-        struct FlowResponse: Codable {
-            var flows: [FlowType]
-            
-            struct FlowType: Codable {
-                var type: MatrixLoginFlow
-            }
-        }
-        
-        let flows = try await request("/_matrix/client/r0/login", withAuthorization: false, forType: FlowResponse.self)
+        let flows = try await MatrixLoginFlowRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
         
         return flows.flows.map({$0.type})
-    }
-    
-    // Mark: - Helpers
-    func urlComponents(_ path: String) throws -> URL {
-        var components = self.homeserver.url
-        
-        components.path = path
-        
-        guard let url = components.url else {
-            throw MatrixError.NotFound
-        }
-        return url
-    }
-    
-    func urlRequest(_ path: String, withAuthorization: Bool = true) throws -> URLRequest {
-        var requst = URLRequest(url: try urlComponents(path))
-        
-        if withAuthorization {
-            guard let accessToken = accessToken else {
-                throw MatrixError.Forbidden
-            }
-            requst.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        }
-        
-        return requst
-    }
-    
-    func request(_ path: String, withAuthorization: Bool = true) async throws -> Data {
-        let request = try urlRequest(path, withAuthorization: withAuthorization)
-        
-        let (data, urlResponse) = try await urlSession.data(for: request)
-        
-        guard let response = urlResponse as? HTTPURLResponse else {
-            throw MatrixError.Unknown
-        }
-        guard response.statusCode == 200 else {
-            throw try MatrixServerError(json: data, code: response.statusCode)
-        }
-        
-        return data
-    }
-    
-    func request<T: Decodable>(_ path: String, withAuthorization: Bool = true, forType type: T.Type) async throws -> T {
-        let data = try await request(path, withAuthorization: withAuthorization)
-        
-        let decoder = JSONDecoder()
-        return try decoder.decode(type, from: data)
     }
 }
 

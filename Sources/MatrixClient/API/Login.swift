@@ -7,6 +7,28 @@
 
 import Foundation
 
+public struct MatrixLoginFlowRequest: MatrixRequest {
+    public typealias Response = Self.ResponseStruct
+    
+    public typealias URLParameters = ()
+    
+    public func path(with parameters: ()) -> String {
+        return "/_matrix/client/r0/login"
+    }
+    
+    public static var httpMethod = HttpMethode.GET
+    
+    public static var requiresAuth = false
+    
+    public struct ResponseStruct: MatrixResponse {
+        var flows: [FlowType]
+        
+        struct FlowType: Codable {
+            var type: MatrixLoginFlow
+        }
+    }
+}
+
 public struct MatrixLoginFlow: Codable {
     public var value: String
     
