@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum HttpMethode: String, CaseIterable {
+public enum HttpMethod: String, CaseIterable {
     case GET = "GET"
     case POST = "POST"
     case PUT = "PUT"
@@ -22,7 +22,7 @@ public protocol MatrixRequest: Codable {
     associatedtype URLParameters
     func path(with parameters: URLParameters) -> String
     
-    static var httpMethod: HttpMethode { get }
+    static var httpMethod: HttpMethod { get }
     static var requiresAuth: Bool { get }
     // TODO: rate limited property?
 }
@@ -43,7 +43,7 @@ public extension MatrixRequest {
         }
         
         urlRequest.httpMethod = Self.httpMethod.rawValue
-        if HttpMethode.containsBoddy.contains(Self.httpMethod) {
+        if HttpMethod.containsBoddy.contains(Self.httpMethod) {
             urlRequest.httpBody = try? JSONEncoder().encode(self)
         }
         

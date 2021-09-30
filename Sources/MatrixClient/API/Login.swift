@@ -16,7 +16,7 @@ public struct MatrixLoginFlowRequest: MatrixRequest {
         return "/_matrix/client/r0/login"
     }
     
-    public static var httpMethod = HttpMethode.GET
+    public static var httpMethod = HttpMethod.GET
     
     public static var requiresAuth = false
     
@@ -245,7 +245,7 @@ extension MatrixLoginRequest: MatrixRequest {
         return "/_matrix/client/r0/login"
     }
     
-    public static var httpMethod = HttpMethode.POST
+    public static var httpMethod = HttpMethod.POST
     
     public static var requiresAuth = false
 }

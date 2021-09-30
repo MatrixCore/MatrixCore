@@ -20,7 +20,7 @@ public struct MatrixLogoutRequest: MatrixRequest {
         }
     }
     
-    public static var httpMethod = HttpMethode.POST
+    public static var httpMethod = HttpMethod.POST
     
     public static var requiresAuth = true
 }

@@ -38,7 +38,7 @@ public struct MatrixServerInfoRequest: MatrixRequest {
         return "/_matrix/client/versions"
     }
     
-    public static var httpMethod = HttpMethode.GET
+    public static var httpMethod = HttpMethod.GET
     
     public static var requiresAuth = false
 }
@@ -66,7 +66,7 @@ public struct MatrixWellKnownRequest: MatrixRequest {
         return "/.well-known/matrix/client"
     }
     
-    public static var httpMethod = HttpMethode.GET
+    public static var httpMethod = HttpMethod.GET
     
     public static var requiresAuth = false
 }
