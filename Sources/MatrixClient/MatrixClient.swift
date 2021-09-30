@@ -32,6 +32,7 @@ public struct MatrixClient {
     ///    Rate-limited:    No.
     ///    Requires auth:   No.
     /// ```
+    @available(swift, introduced: 5.5)
     public func getVersions() async throws -> MatrixServerInfo {
         return try await MatrixServerInfoRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
@@ -45,6 +46,7 @@ public struct MatrixClient {
     ///    Rate-limited:    No.
     ///    Requires auth:   No.
     ///```
+    @available(swift, introduced: 5.5)
     public func getWellKnown() async throws -> MatrixWellKnown {
         return try await MatrixWellKnownRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
@@ -55,6 +57,7 @@ public struct MatrixClient {
     ///    Rate-limited:    Yes.
     ///    Requires auth:   No.
     /// ```
+    @available(swift, introduced: 5.5)
     public func getLoginFlows() async throws -> [MatrixLoginFlow] {
         let flows = try await MatrixLoginFlowRequest().repsonse(on: homeserver, with: (), withUrlSession: urlSession)
         
@@ -72,6 +75,7 @@ public struct MatrixClient {
     ///    Rate-limited:    Yes.
     ///    Requires auth:   No.
     ///```
+    @available(swift, introduced: 5.5)
     public func login(token: Bool = false, username: String, password: String, displayName: String? = nil, deviceId: String? = nil) async throws -> MatrixLogin {
         let flow: MatrixLoginFlow
         if token {
@@ -100,6 +104,7 @@ public struct MatrixClient {
     ///    Rate-limited:    Yes.
     ///    Requires auth:   No.
     ///```
+    @available(swift, introduced: 5.5)
     public func login(request: MatrixLoginRequest) async throws -> MatrixLogin {
         return try await request.repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
@@ -114,8 +119,9 @@ public struct MatrixClient {
     ///    Rate-limited:    No.
     ///    Requires auth:   Yes.
     ///```
+    @available(swift, introduced: 5.5)
     public func logout() async throws {
-        try await MatrixLogoutRequest().repsonse(on: homeserver, with: false, withUrlSession: urlSession)
+        let _ = try await MatrixLogoutRequest().repsonse(on: homeserver, with: false, withUrlSession: urlSession)
     }
     
     /// Invalidates all access tokens for a user, so that they can no longer be used for authorization. This includes the access token that made this request.
@@ -130,8 +136,9 @@ public struct MatrixClient {
     ///    Rate-limited:    No.
     ///    Requires auth:   Yes.
     ///```
+    @available(swift, introduced: 5.5)
     public func logoutAll() async throws {
-        try await MatrixLogoutRequest().repsonse(on: homeserver, with: true, withUrlSession: urlSession)
+        let _ = try await MatrixLogoutRequest().repsonse(on: homeserver, with: true, withUrlSession: urlSession)
     }
 }
 

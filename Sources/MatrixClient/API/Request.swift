@@ -27,6 +27,7 @@ public protocol MatrixRequest: Codable {
     // TODO: rate limited property?
 }
 
+
 public extension MatrixRequest {
     func request(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters) throws -> URLRequest {
         let components = homeserver.path(self.path(with: parameters))
@@ -49,6 +50,7 @@ public extension MatrixRequest {
         return urlRequest
     }
     
+    @available(swift, introduced: 5.5)
     func repsonse(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters, withUrlSession urlSession: URLSession = URLSession.shared) async throws -> Response {
         let request = try request(on: homeserver, withToken: token, with: parameters)
         
@@ -65,11 +67,11 @@ public extension MatrixRequest {
     }
 }
 
+/// Protocol for a Matrix server response
 public protocol MatrixResponse: Codable {
 }
 
 public extension MatrixResponse {
-    /// Init from http json data
     init(fromMatrixRequestData data: Data) throws {
         let decoder = JSONDecoder()
         self = try decoder.decode(Self.self, from: data)

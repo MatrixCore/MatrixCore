@@ -8,6 +8,7 @@
 import XCTest
 @testable import MatrixClient
 
+@available(swift, introduced: 5.5)
 final class MatrixClientTests: XCTestCase {
     let client = MatrixClient(homeserver: MatrixHomeserver(string: "https://matrix-client.matrix.org")!)
     
