@@ -103,6 +103,36 @@ public struct MatrixClient {
     public func login(request: MatrixLoginRequest) async throws -> MatrixLogin {
         return try await request.repsonse(on: homeserver, with: (), withUrlSession: urlSession)
     }
+    
+    // 5.5.3 POST /_matrix/client/r0/logout
+    /// Invalidates an existing access token, so that it can no longer be used for authorization. The device associated with the
+    /// access token is also deleted. [Device keys](https://matrix.org/docs/spec/client_server/latest#device-keys) for the device
+    /// are deleted alongside the device.
+    ///
+    ///
+    ///```markdown
+    ///    Rate-limited:    No.
+    ///    Requires auth:   Yes.
+    ///```
+    public func logout() async throws {
+        try await MatrixLogoutRequest().repsonse(on: homeserver, with: false, withUrlSession: urlSession)
+    }
+    
+    /// Invalidates all access tokens for a user, so that they can no longer be used for authorization. This includes the access token that made this request.
+    /// All devices for the user are also deleted. [Device keys](https://matrix.org/docs/spec/client_server/latest#device-keys) for
+    /// the device are deleted alongside the device.
+    ///
+    /// This endpoint does not require UI authorization because UI authorization is designed to protect against attacks where the someone gets hold of a
+    /// single access token then takes over the account. This endpoint invalidates all access tokens for the user, including the token used in the request,
+    /// and therefore the attacker is unable to take over the account in this way.
+    ///
+    ///```markdown
+    ///    Rate-limited:    No.
+    ///    Requires auth:   Yes.
+    ///```
+    public func logoutAll() async throws {
+        try await MatrixLogoutRequest().repsonse(on: homeserver, with: true, withUrlSession: urlSession)
+    }
 }
 
 
