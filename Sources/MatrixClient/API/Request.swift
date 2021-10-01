@@ -51,7 +51,7 @@ public extension MatrixRequest {
     }
     
     @available(swift, introduced: 5.5)
-    func repsonse(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters, withUrlSession urlSession: URLSession = URLSession.shared) async throws -> Response {
+    func response(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters, withUrlSession urlSession: URLSession = URLSession.shared) async throws -> Response {
         let request = try request(on: homeserver, withToken: token, with: parameters)
         
         let (data, urlResponse) = try await urlSession.data(for: request)
