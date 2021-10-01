@@ -9,7 +9,7 @@ import Foundation
 
 public struct MatrixClient {
     public var homeserver: MatrixHomeserver
-    public var urlSession: URLSession = URLSession(configuration: URLSessionConfiguration.default)
+    public var urlSession: URLSession = URLSession(configuration: .default)
     /// Access token used to authorize api requests
     public var accessToken: String?
     
@@ -34,7 +34,8 @@ public struct MatrixClient {
     /// ```
     @available(swift, introduced: 5.5)
     public func getVersions() async throws -> MatrixServerInfo {
-        return try await MatrixServerInfoRequest().response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
+        try await MatrixServerInfoRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
     }
     
     /// Gets discovery information about the domain. The file may include additional keys, which MUST follow the Java package naming convention,
@@ -48,7 +49,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func getWellKnown() async throws -> MatrixWellKnown {
-        return try await MatrixWellKnownRequest().response(on: homeserver, with: (), withUrlSession: urlSession)
+        try await MatrixWellKnownRequest()
+            .response(on: homeserver, with: (), withUrlSession: urlSession)
     }
     
     /// Gets the homeserver's supported login types to authenticate users. Clients should pick one of these and supply it as the type when logging in.
@@ -59,9 +61,9 @@ public struct MatrixClient {
     /// ```
     @available(swift, introduced: 5.5)
     public func getLoginFlows() async throws -> [MatrixLoginFlow] {
-        let flows = try await MatrixLoginFlowRequest().response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
-        
-        return flows.flows.map({$0.type})
+        try await MatrixLoginFlowRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
+            .flows.map(\.type)
     }
     
     /// Authenticates the user, and issues an access token they can use to authorize themself in subsequent requests.
@@ -76,14 +78,25 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     ///```
     @available(swift, introduced: 5.5)
-    public func login(token: Bool = false, username: String, password: String, displayName: String? = nil, deviceId: String? = nil) async throws -> MatrixLogin {
+    public func login(
+        token: Bool = false,
+        username: String,
+        password: String,
+        displayName: String? = nil,
+        deviceId: String? = nil
+    ) async throws -> MatrixLogin {
         let flow: MatrixLoginFlow
         if token {
             flow = .token
         } else {
             flow = .password
         }
-        var request = MatrixLoginRequest(type: flow.value, identifier: MatrixLoginUserIdentifier.user(id: username), deviceId: deviceId, initialDeviceDisplayName: displayName)
+        var request = MatrixLoginRequest(
+            type: flow.value,
+            identifier: MatrixLoginUserIdentifier.user(id: username),
+            deviceId: deviceId,
+            initialDeviceDisplayName: displayName
+        )
         if token {
             request.token = password
         } else {
@@ -106,7 +119,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func login(request: MatrixLoginRequest) async throws -> MatrixLogin {
-        return try await request.response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
+        return try await request
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
     }
     
     // 5.5.3 POST /_matrix/client/r0/logout
@@ -121,7 +135,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func logout() async throws {
-        let _ = try await MatrixLogoutRequest().response(on: homeserver, withToken: accessToken, with: false, withUrlSession: urlSession)
+        let _ = try await MatrixLogoutRequest()
+            .response(on: homeserver, withToken: accessToken, with: false, withUrlSession: urlSession)
     }
     
     /// Invalidates all access tokens for a user, so that they can no longer be used for authorization. This includes the access token that made this request.
@@ -138,7 +153,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func logoutAll() async throws {
-        let _ = try await MatrixLogoutRequest().response(on: homeserver, withToken: accessToken, with: true, withUrlSession: urlSession)
+        let _ = try await MatrixLogoutRequest()
+            .response(on: homeserver, withToken: accessToken, with: true, withUrlSession: urlSession)
     }
     
     /// Uploads a new filter definition to the homeserver. Returns a filter ID that may be used in future requests to restrict which events are returned to the client.
@@ -149,7 +165,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func setFilter(userId: String, filter: MatrixFilter) async throws -> MatrixFilterId {
-        var id = try await filter.response(on: homeserver, withToken: accessToken, with: userId, withUrlSession: urlSession)
+        var id = try await filter
+            .response(on: homeserver, withToken: accessToken, with: userId, withUrlSession: urlSession)
         
         id.user = userId
         return id
@@ -164,7 +181,7 @@ public struct MatrixClient {
     @available(swift, introduced: 5.5)
     @inlinable
     public func getFilter(userId: String, filterId: String) async throws -> MatrixFilter {
-        return try await getFilter(with: MatrixFilterId(user: userId, filter: filterId))
+        try await getFilter(with: MatrixFilterId(user: userId, filter: filterId))
     }
     
     /// Download a filter
@@ -175,7 +192,8 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func getFilter(with id: MatrixFilterId) async throws -> MatrixFilter {
-        return try await MatrixFilterRequest().response(on: homeserver, withToken: accessToken, with: id, withUrlSession: urlSession)
+        try await MatrixFilterRequest()
+            .response(on: homeserver, withToken: accessToken, with: id, withUrlSession: urlSession)
     }
 }
 
