@@ -4,7 +4,7 @@ import AnyCodable
 /// A protocol that all room event structs should conform to in order
 /// to be decoded by the client. Don't forget to add any new structs
 /// to `Client.eventTypes` for included in the JSON decoder.
-public protocol RoomEvent: Decodable {
+public protocol MatrixEvent: Codable {
     static var type: String { get }
     
     // var content: Content { get }
@@ -22,13 +22,13 @@ enum RoomEventTypeKeys: CodingKey {
 enum RoomEventDecodableError: Error {
     case missingTypes
     case unableToFindType(String)
-    case unableToCast(decoded: RoomEvent?, into: String)
+    case unableToCast(decoded: MatrixEvent?, into: String)
 }
 
 extension KeyedDecodingContainer {
     // The synthesized decoding for RoomEventArray will throw if the key is missing. This fixes that.
-    func decode<T>(_ type: DecodableRoomEvents<T>.Type, forKey key: Self.Key) throws -> DecodableRoomEvents<T> {
-        return try decodeIfPresent(type, forKey: key) ?? DecodableRoomEvents<T>(wrappedValue: nil)
+    func decode<T>(_ type: MatrixDecodableEvents<T>.Type, forKey key: Self.Key) throws -> MatrixDecodableEvents<T> {
+        return try decodeIfPresent(type, forKey: key) ?? MatrixDecodableEvents<T>(wrappedValue: nil)
     }
 }
 
@@ -39,10 +39,12 @@ extension CodingUserInfoKey {
     }
 }
 
+// TODO: encodable
 @propertyWrapper
-public struct DecodableRoomEvents<Value: Collection>: Decodable where Value.Element == RoomEvent {
+public struct MatrixDecodableEvents<Value: Collection>: Decodable where Value.Element == MatrixEvent {
     public var wrappedValue: Value?
     
+    // TODO: encodable?
     private struct RoomEventWrapper<T>: Decodable {
         var wrappedEvent: T?
         
@@ -51,7 +53,7 @@ public struct DecodableRoomEvents<Value: Collection>: Decodable where Value.Elem
             let container = try decoder.container(keyedBy: RoomEventTypeKeys.self)
             let typeID = try container.decode(String.self, forKey: .type)
             
-            guard let types = decoder.userInfo[.roomEventTypes] as? [RoomEvent.Type] else {
+            guard let types = decoder.userInfo[.roomEventTypes] as? [MatrixEvent.Type] else {
                 // the decoder must be supplied with some event types to decode
                 throw RoomEventDecodableError.missingTypes
             }
