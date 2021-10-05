@@ -1,10 +1,10 @@
 import Foundation
 import AnyCodable
 
-public struct RoomMessageEvent: RoomEvent {
+public struct MatrixMessageEvent: MatrixEvent {
     public static var type = "m.room.message"
     
-    public let content: MessageContent
+    public let content: MatrixMessageContent
     public let type: String
     public let eventID: String
     public let sender: String

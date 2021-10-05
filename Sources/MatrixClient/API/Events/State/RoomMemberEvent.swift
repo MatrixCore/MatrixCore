@@ -1,7 +1,7 @@
 import Foundation
 import AnyCodable
 
-public struct RoomMemberEvent: RoomEvent {
+public struct MatrixMemberEvent: MatrixEvent {
     public static var type = "m.room.member"
     
     public let content: Content
@@ -23,10 +23,10 @@ public struct RoomMemberEvent: RoomEvent {
         case stateKey = "state_key"
     }
     
-    public struct Content: Decodable {
+    public struct Content: Codable {
         public let avatarURL: String?
         public let displayName: String?
-        public let membership: Membership?
+        public let membership: MatrixMembership?
         public let isDirect: Bool?
         
         enum CodingKeys: String, CodingKey {

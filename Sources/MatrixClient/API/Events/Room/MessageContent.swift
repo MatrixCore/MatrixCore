@@ -1,12 +1,12 @@
 import Foundation
 
-public struct MessageContent: Decodable {
+public struct MatrixMessageContent: Codable {
     // required
     public let body: String?
     public let type: MessageType?
     
     // optional
-    public let relationship: Relationship?
+    public let relationship: MatrixRelationship?
     public let mediaURL: URL?
     public let mediaInfo: MediaInfo?
     
@@ -22,7 +22,7 @@ public struct MessageContent: Decodable {
         case newContent = "m.new_content"
     }
     
-    public struct MediaInfo: Decodable {
+    public struct MediaInfo: Codable {
         public let width: Int?
         public let height: Int?
         public let mimetype: String?
@@ -36,11 +36,11 @@ public struct MessageContent: Decodable {
         }
     }
     
-    public struct NewContent: Decodable {
+    public struct NewContent: Codable {
         public let body: String?
     }
     
-    public enum MessageType: String, Decodable {
+    public enum MessageType: String, Codable {
         case text = "m.text"
         case emote = "m.emote"
         case notice = "m.notice"

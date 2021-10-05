@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Relationship: Codable {
+public struct MatrixRelationship: Codable {
     public let type: RelationshipType?
     public let eventID: String?
     public let key: String?

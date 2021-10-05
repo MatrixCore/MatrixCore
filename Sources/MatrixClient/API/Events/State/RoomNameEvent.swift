@@ -1,7 +1,7 @@
 import Foundation
 import AnyCodable
 
-public struct RoomNameEvent: RoomEvent {
+public struct MatrixNameEvent: MatrixEvent {
     public static var type = "m.room.name"
     
     public let content: Content
@@ -23,7 +23,7 @@ public struct RoomNameEvent: RoomEvent {
         case stateKey = "state_key"
     }
     
-    public struct Content: Decodable {
+    public struct Content: Codable {
         public let name: String?
     }
 }

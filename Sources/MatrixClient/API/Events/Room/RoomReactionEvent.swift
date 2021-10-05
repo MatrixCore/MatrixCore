@@ -1,7 +1,7 @@
 import Foundation
 import AnyCodable
 
-public struct RoomReactionEvent: RoomEvent {
+public struct MatrixReactionEvent: MatrixEvent {
     public static var type = "m.reaction"
     
     public let content: Content
@@ -20,8 +20,8 @@ public struct RoomReactionEvent: RoomEvent {
         case unsigned
     }
     
-    public struct Content: Decodable {
-        public let relationship: Relationship?
+    public struct Content: Codable {
+        public let relationship: MatrixRelationship?
         
         enum CodingKeys: String, CodingKey {
             case relationship = "m.relates_to"
