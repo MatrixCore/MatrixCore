@@ -15,47 +15,47 @@ public protocol MatrixEvent: Codable {
 }
 
 /// The coding keys needed to determine an event's type before decoding.
-enum RoomEventTypeKeys: CodingKey {
+enum MatrixEventTypeKeys: CodingKey {
     case type
 }
 
-enum RoomEventDecodableError: Error {
+enum MatrixEventCodableError: Error {
     case missingTypes
     case unableToFindType(String)
     case unableToCast(decoded: MatrixEvent?, into: String)
 }
 
 extension KeyedDecodingContainer {
-    // The synthesized decoding for RoomEventArray will throw if the key is missing. This fixes that.
-    func decode<T>(_ type: MatrixDecodableEvents<T>.Type, forKey key: Self.Key) throws -> MatrixDecodableEvents<T> {
-        return try decodeIfPresent(type, forKey: key) ?? MatrixDecodableEvents<T>(wrappedValue: nil)
+    // The synthesized decoding for MatrixCodableEvents will throw if the key is missing. This fixes that.
+    func decode<T>(_ type: MatrixCodableEvents<T>.Type, forKey key: Self.Key) throws -> MatrixCodableEvents<T> {
+        return try decodeIfPresent(type, forKey: key) ?? MatrixCodableEvents<T>(wrappedValue: nil)
     }
 }
 
 extension CodingUserInfoKey {
-    /// The key used to determing the types of `RoomEvent` that can be decoded.
-    static var roomEventTypes: CodingUserInfoKey {
-        CodingUserInfoKey(rawValue: "uk.pixlwave.RoomEventTypes")!
+    /// The key used to determine the types of `MatrixEvent` that can be decoded.
+    static var matrixEventTypes: CodingUserInfoKey {
+        CodingUserInfoKey(rawValue: "MatrixCore.EventTypes")!
     }
 }
 
 // TODO: encodable
 @propertyWrapper
-public struct MatrixDecodableEvents<Value: Collection>: Decodable where Value.Element == MatrixEvent {
+public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Element == MatrixEvent {
     public var wrappedValue: Value?
     
     // TODO: encodable?
-    private struct RoomEventWrapper<T>: Decodable {
+    private struct EventWrapper<T>: Codable {
         var wrappedEvent: T?
         
         init(from decoder: Decoder) throws {
             // these can throw as something has gone seriously wrong if the type key is missing
-            let container = try decoder.container(keyedBy: RoomEventTypeKeys.self)
+            let container = try decoder.container(keyedBy: MatrixEventTypeKeys.self)
             let typeID = try container.decode(String.self, forKey: .type)
             
-            guard let types = decoder.userInfo[.roomEventTypes] as? [MatrixEvent.Type] else {
+            guard let types = decoder.userInfo[.matrixEventTypes] as? [MatrixEvent.Type] else {
                 // the decoder must be supplied with some event types to decode
-                throw RoomEventDecodableError.missingTypes
+                throw MatrixEventCodableError.missingTypes
             }
             
             guard let matchingType = types.first(where: { $0.type == typeID }) else {
@@ -64,16 +64,20 @@ public struct MatrixDecodableEvents<Value: Collection>: Decodable where Value.El
             }
             
             guard let decoded = try? matchingType.init(from: decoder) else {
-                assertionFailure("Failed to decode RoomEvent as \(String(describing: T.self))")
+                assertionFailure("Failed to decode MatrixEvent as \(String(describing: T.self))")
                 return
             }
             
             guard let decoded = decoded as? T else {
                 // something has probably gone very wrong at this stage
-                throw RoomEventDecodableError.unableToCast(decoded: decoded, into: String(describing: T.self))
+                throw MatrixEventCodableError.unableToCast(decoded: decoded, into: String(describing: T.self))
             }
             
             self.wrappedEvent = decoded
+        }
+        
+        func encode(to encoder: Encoder) throws {
+            fatalError("Event encoding not implemented.")
         }
     }
     
@@ -86,9 +90,13 @@ public struct MatrixDecodableEvents<Value: Collection>: Decodable where Value.El
 
     public init(from decoder: Decoder) {
         guard let container = try? decoder.singleValueContainer(),
-              let wrappers = try? container.decode([RoomEventWrapper<Value.Element>].self)
+              let wrappers = try? container.decode([EventWrapper<Value.Element>].self)
         else { return }
         
         wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        fatalError("Event encoding not implemented.")
     }
 }

@@ -9,11 +9,36 @@ import Foundation
 
 public struct MatrixClient {
     public var homeserver: MatrixHomeserver
-    public var urlSession: URLSession = URLSession(configuration: .default)
+    public var urlSession: URLSession
     /// Access token used to authorize api requests
     public var accessToken: String?
     
-    // 2.1 GET /_maftrix/client/versions
+    /// An array containing all of the event types that the client should decode.
+    /// By default this contains all of the events implemented within the library.
+    ///
+    /// Add any custom events you would like decoded to this array.
+    public static var eventTypes: [MatrixEvent.Type] = [
+        MatrixEncryptionEvent.self,
+        MatrixMemberEvent.self,
+        MatrixMessageEvent.self,
+        MatrixNameEvent.self,
+        MatrixReactionEvent.self,
+        MatrixRedactionEvent.self
+    ]
+    
+    /// Initializes a Matrix client object with the specified parameters.
+    /// - Parameters:
+    ///   - homeserver: The homeserver the client should contact.
+    ///   - urlSession: An optional `URLSession` to use for requests. A new session is created if `nil`.
+    ///   - accessToken: An optional access token to use for requests if already logged in.
+    public init(homeserver: MatrixHomeserver, urlSession: URLSession = URLSession(configuration: .default), accessToken: String? = nil) {
+        self.homeserver = homeserver
+        self.urlSession = urlSession
+        self.accessToken = accessToken
+    }
+
+    
+    // 2.1 GET /_matrix/client/versions
     /// Gets the versions of the specification supported by the server.
     ///
     /// Values will take the form `rX.Y.Z`.
@@ -194,6 +219,12 @@ public struct MatrixClient {
     public func getFilter(with id: MatrixFilterId) async throws -> MatrixFilter {
         try await MatrixFilterRequest()
             .response(on: homeserver, withToken: accessToken, with: id, withUrlSession: urlSession)
+    }
+    
+    @available(swift, introduced: 5.5)
+    public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSyncResponse {
+        try await MatrixSyncRequest()
+            .response(on: homeserver, withToken: accessToken, with: parameters)
     }
 }
 
