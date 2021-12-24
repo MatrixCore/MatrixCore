@@ -13,7 +13,7 @@ public enum HttpMethod: String, CaseIterable {
     case PUT = "PUT"
     case PATCH = "PATCH"
     
-    static var containsBoddy: [Self] = [ .POST, .PUT, .PATCH ]
+    static var containsBody: [Self] = [ .POST, .PUT, .PATCH ]
 }
 
 public protocol MatrixRequest: Codable {
@@ -43,7 +43,7 @@ public extension MatrixRequest {
         }
         
         urlRequest.httpMethod = Self.httpMethod.rawValue
-        if HttpMethod.containsBoddy.contains(Self.httpMethod) {
+        if HttpMethod.containsBody.contains(Self.httpMethod) {
             urlRequest.httpBody = try? JSONEncoder().encode(self)
         }
         
@@ -74,6 +74,7 @@ public protocol MatrixResponse: Codable {
 public extension MatrixResponse {
     init(fromMatrixRequestData data: Data) throws {
         let decoder = JSONDecoder()
+        decoder.userInfo[.matrixEventTypes] = MatrixClient.eventTypes
         self = try decoder.decode(Self.self, from: data)
     }
 }
