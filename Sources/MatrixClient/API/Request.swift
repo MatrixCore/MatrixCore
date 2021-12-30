@@ -74,6 +74,7 @@ public protocol MatrixResponse: Codable {
 public extension MatrixResponse {
     init(fromMatrixRequestData data: Data) throws {
         let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .millisecondsSince1970
         decoder.userInfo[.matrixEventTypes] = MatrixClient.eventTypes
         self = try decoder.decode(Self.self, from: data)
     }
