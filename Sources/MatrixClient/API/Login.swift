@@ -12,8 +12,10 @@ public struct MatrixLoginFlowRequest: MatrixRequest {
     
     public typealias URLParameters = ()
     
-    public func path(with parameters: ()) -> String {
-        return "/_matrix/client/r0/login"
+    public func components(for homeserver: MatrixHomeserver, with parameters: ()) -> URLComponents {
+        var components = homeserver.url
+        components.path = "/_matrix/client/r0/login"
+        return components
     }
     
     public static var httpMethod = HttpMethod.GET
@@ -241,8 +243,10 @@ extension MatrixLoginRequest: MatrixRequest {
     
     public typealias URLParameters = ()
     
-    public func path(with parameters: ()) -> String {
-        return "/_matrix/client/r0/login"
+    public func components(for homeserver: MatrixHomeserver, with parameters: ()) -> URLComponents {
+        var components = homeserver.url
+        components.path = "/_matrix/client/r0/login"
+        return components
     }
     
     public static var httpMethod = HttpMethod.POST

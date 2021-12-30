@@ -1,30 +1,30 @@
 import Foundation
 
 public struct MatrixSyncRequest: MatrixRequest {
-    public func path(with parameters: URLParameters) throws -> String {
-        var components = URLComponents()
+    public func components(for homeserver: MatrixHomeserver, with parameters: URLParameters) throws -> URLComponents {
+        var components = homeserver.url
         components.path = "/_matrix/client/r0/sync"
-        
+
         var queryItems = [URLQueryItem]()
-        
+
         if let filter = parameters.filter {
             queryItems.append(URLQueryItem(name: "filter", value: filter))
         }
-        
+
         if let since = parameters.since {
             queryItems.append(URLQueryItem(name: "since", value: since))
         }
-        
+
         // TODO: fullState
         // TODO: presence
-        
+
         if let timeout = parameters.timeout {
             queryItems.append(URLQueryItem(name: "timeout", value: String(timeout)))
         }
-        
+
         components.queryItems = queryItems
-        
-        return components.string ?? "/_matrix/client/r0/sync"
+
+        return components
     }
     
     public typealias Response = MatrixSyncResponse
