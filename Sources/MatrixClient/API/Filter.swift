@@ -26,7 +26,7 @@ public struct MatrixFilterRequest: MatrixRequest {
     
     public typealias URLParameters = MatrixFilterId
     
-    public func path(with parameters: MatrixFilterId) throws -> String {
+    public func components(for homeserver: MatrixHomeserver, with parameters: MatrixFilterId) throws -> URLComponents {
         // FIXME: url encode
         guard
             let userId = parameters.user,
@@ -34,7 +34,10 @@ public struct MatrixFilterRequest: MatrixRequest {
         else {
             throw MatrixError.Unrecognized
         }
-        return "/_matrix/client/r0/user/\(userId)/filter/\(filterId)"
+        
+        var components = homeserver.url
+        components.path = "/_matrix/client/r0/user/\(userId)/filter/\(filterId)"
+        return components
     }
     
     public static var httpMethod = HttpMethod.GET
@@ -245,9 +248,11 @@ extension MatrixFilter: MatrixRequest {
     public typealias URLParameters = String
     
     /// with -> userId
-    public func path(with parameters: String) -> String {
+    public func components(for homeserver: MatrixHomeserver, with parameters: String) -> URLComponents {
         // TODO: url encode
-        return "/_matrix/client/r0/user/\(parameters)/filter"
+        var components = homeserver.url
+        components.path = "/_matrix/client/r0/user/\(parameters)/filter"
+        return components
     }
     
     public static var httpMethod = HttpMethod.POST

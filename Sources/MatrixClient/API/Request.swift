@@ -20,7 +20,7 @@ public protocol MatrixRequest: Codable {
     associatedtype Response: MatrixResponse
     
     associatedtype URLParameters
-    func path(with parameters: URLParameters) throws -> String
+    func components(for homeserver: MatrixHomeserver, with parameters: URLParameters) throws -> URLComponents
     
     static var httpMethod: HttpMethod { get }
     static var requiresAuth: Bool { get }
@@ -30,7 +30,7 @@ public protocol MatrixRequest: Codable {
 
 public extension MatrixRequest {
     func request(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters) throws -> URLRequest {
-        let components = homeserver.path(try self.path(with: parameters))
+        let components = try components(for: homeserver, with: parameters)
         // components.queryItems = self.queryParameters
         
         var urlRequest = URLRequest(url: components.url!)

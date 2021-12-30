@@ -34,8 +34,10 @@ public struct MatrixServerInfoRequest: MatrixRequest {
     
     public typealias URLParameters = ()
     
-    public func path(with parameters: ()) -> String {
-        return "/_matrix/client/versions"
+    public func components(for homeserver: MatrixHomeserver, with parameters: ()) -> URLComponents {
+        var components = homeserver.url
+        components.path = "/_matrix/client/versions"
+        return components
     }
     
     public static var httpMethod = HttpMethod.GET
@@ -62,8 +64,10 @@ public struct MatrixWellKnownRequest: MatrixRequest {
     
     public typealias URLParameters = ()
     
-    public func path(with parameters: ()) -> String {
-        return "/.well-known/matrix/client"
+    public func components(for homeserver: MatrixHomeserver, with parameters: ()) -> URLComponents {
+        var components = homeserver.url
+        components.path = "/.well-known/matrix/client"
+        return components
     }
     
     public static var httpMethod = HttpMethod.GET
