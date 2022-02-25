@@ -22,6 +22,28 @@ public struct MatrixHomeserver: Codable {
         self.url = components
     }
     
+    @available(swift, introduced: 5.5)
+    public init(resolve string: String, withUrlSession urlSession: URLSession = URLSession.shared) async throws {
+        guard let self = MatrixHomeserver(string: string) else {
+            throw MatrixError.NotFound
+        }
+        
+        var res: MatrixWellKnown
+        do {
+            res = try await MatrixWellKnownRequest().response(on: self, with: (), withUrlSession: urlSession)
+        } catch is MatrixServerError {
+            url = self.url
+            return
+        }
+        
+        if let home_url = res.matrixHomeServer?.url {
+            url = home_url
+        } else {
+            url = self.url
+        }
+    }
+    
+    
     public func path(_ path: String) -> URLComponents {
         var components = url
         components.path = path
@@ -86,6 +108,13 @@ public struct MatrixWellKnown: MatrixResponse {
     /// The base URL for the homeserver for client-server connections.
     public var homeServerBaseUrl: String? {
         homeserver?.baseURL
+    }
+    
+    public var matrixHomeServer: MatrixHomeserver? {
+        guard let url = homeServerBaseUrl else {
+            return nil
+        }
+        return MatrixHomeserver(string: url)
     }
     
     /// The base URL for the homeserver for client-server connections.

@@ -1,0 +1,22 @@
+//
+// Created by Finn Behrens on 05.02.22.
+//
+
+import Foundation
+import ArgumentParser
+
+@main
+struct Mcc: ParsableCommand {
+    
+    static var configuration = CommandConfiguration(
+        commandName: "mcc",
+        abstract: "MatrixClient tests",
+        version: "0.1.0",
+        subcommands: [
+            LoginCommand.self
+            //RegisterCommand
+        ]
+    )
+
+
+}
