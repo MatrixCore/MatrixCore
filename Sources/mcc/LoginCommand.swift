@@ -30,7 +30,7 @@ struct LoginCommand: ParsableCommand {
     
     func run() async throws {
         let logger = Logger.init()
-        let client = await MatrixClient.init(homeserver: try MatrixHomeserver.init(resolve: homeserver))
+        let client = await MatrixClient(homeserver: try MatrixHomeserver(resolve: homeserver))
         
         logger.debug("resolved url: \(client.homeserver.url)")
         
