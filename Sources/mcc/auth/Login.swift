@@ -64,11 +64,7 @@ extension Mcc.Auth {
             let info = try await client.getVersions()
             logger.debug("server has versions: \(info.versions)")
 
-            if all {
-                try await client.logoutAll()
-            } else {
-                try await client.logout()
-            }
+            try await client.logout(all: all)
         }
     }
 }

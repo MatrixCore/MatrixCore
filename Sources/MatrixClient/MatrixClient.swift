@@ -164,9 +164,9 @@ public struct MatrixClient {
     ///    Requires auth:   Yes.
     ///```
     @available(swift, introduced: 5.5)
-    public func logout() async throws {
+    public func logout(all: Bool = false) async throws {
         let _ = try await MatrixLogoutRequest()
-            .response(on: homeserver, withToken: accessToken, with: false, withUrlSession: urlSession)
+            .response(on: homeserver, withToken: accessToken, with: all, withUrlSession: urlSession)
     }
     
     /// Invalidates all access tokens for a user, so that they can no longer be used for authorization. This includes the access token that made this request.
@@ -183,8 +183,7 @@ public struct MatrixClient {
     ///```
     @available(swift, introduced: 5.5)
     public func logoutAll() async throws {
-        let _ = try await MatrixLogoutRequest()
-            .response(on: homeserver, withToken: accessToken, with: true, withUrlSession: urlSession)
+        try await self.logout(all: true)
     }
     
     /// Uploads a new filter definition to the homeserver. Returns a filter ID that may be used in future requests to restrict which events are returned to the client.
