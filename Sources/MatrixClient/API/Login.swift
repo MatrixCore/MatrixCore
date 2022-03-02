@@ -31,8 +31,12 @@ public struct MatrixLoginFlowRequest: MatrixRequest {
     }
 }
 
-public struct MatrixLoginFlow: Codable {
-    public var value: String
+@frozen
+/// A login type supported by the homeserver.
+public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable {
+    public typealias RawValue = String
+    
+    public var rawValue: String
     
     /// The client submits an identifier and secret password, both sent in plain-text.
     ///
@@ -97,18 +101,22 @@ public struct MatrixLoginFlow: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        self.value = try container.decode(String.self)
+        self.rawValue = try container.decode(String.self)
     }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(self.value)
+        try container.encode(self.rawValue)
+    }
+    
+    public init?(rawValue: String) {
+        self.rawValue = rawValue
     }
 }
 
 extension MatrixLoginFlow: ExpressibleByStringLiteral {
     public init(stringLiteral value: StringLiteralType) {
-        self.value = value
+        self.rawValue = value
     }
 }
 

@@ -91,6 +91,11 @@ public struct MatrixClient {
             .flows.map(\.type)
     }
     
+    public func supportsPasswordAuth() async throws -> Bool {
+        let flows = try await self.getLoginFlows()
+        return flows.contains(where: { $0 == MatrixLoginFlow.password })
+    }
+
     /// Authenticates the user, and issues an access token they can use to authorize themself in subsequent requests.
     ///
     /// If the client does not supply a device_id, the server must auto-generate one.
@@ -117,7 +122,7 @@ public struct MatrixClient {
             flow = .password
         }
         var request = MatrixLoginRequest(
-            type: flow.value,
+            type: flow.rawValue,
             identifier: MatrixLoginUserIdentifier.user(id: username),
             deviceId: deviceId,
             initialDeviceDisplayName: displayName

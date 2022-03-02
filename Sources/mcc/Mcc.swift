@@ -13,8 +13,7 @@ struct Mcc: ParsableCommand {
         abstract: "MatrixClient tests",
         version: "0.1.0",
         subcommands: [
-            LoginCommand.self
-            //RegisterCommand
+            Auth.self
         ]
     )
 
