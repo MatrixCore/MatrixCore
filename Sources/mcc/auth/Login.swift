@@ -45,4 +45,30 @@ extension Mcc.Auth {
             print("device id: \(login.deviceId ?? "")")
         }
     }
+
+    struct Logout: ParsableCommand {
+        @OptionGroup var options: Options
+
+        @Option(name: .shortAndLong, help: "Token.")
+        var token: String
+
+        @Flag(name: .long, help: "Logout all devices.")
+        var all = false
+
+        func run() async throws {
+            let logger = Logger.init()
+            let client = await MatrixClient(homeserver: try MatrixHomeserver(resolve: options.homeserver))
+
+            logger.debug("resolved url: \(client.homeserver.url)")
+
+            let info = try await client.getVersions()
+            logger.debug("server has versions: \(info.versions)")
+
+            if all {
+                try await client.logoutAll()
+            } else {
+                try await client.logout()
+            }
+        }
+    }
 }
