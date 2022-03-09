@@ -1,12 +1,12 @@
-import Foundation
 import AnyCodable
+import Foundation
 
 /// A protocol that all room event structs should conform to in order
 /// to be decoded by the client. Don't forget to add any new structs
 /// to `Client.eventTypes` for included in the JSON decoder.
 public protocol MatrixEvent: Codable {
     static var type: String { get }
-    
+
     // var content: Content { get }
     var eventID: String { get }
     var sender: String { get }
@@ -43,45 +43,44 @@ extension CodingUserInfoKey {
 @propertyWrapper
 public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Element == MatrixEvent {
     public var wrappedValue: Value?
-    
+
     // TODO: encodable?
     private struct EventWrapper<T>: Codable {
         var wrappedEvent: T?
-        
+
         init(from decoder: Decoder) throws {
             // these can throw as something has gone seriously wrong if the type key is missing
             let container = try decoder.container(keyedBy: MatrixEventTypeKeys.self)
             let typeID = try container.decode(String.self, forKey: .type)
-            
+
             guard let types = decoder.userInfo[.matrixEventTypes] as? [MatrixEvent.Type] else {
                 // the decoder must be supplied with some event types to decode
                 throw MatrixEventCodableError.missingTypes
             }
-            
+
             guard let matchingType = types.first(where: { $0.type == typeID }) else {
                 // simply ignore events with no matching type as throwing would prevent access to other events
                 return
             }
-            
+
             guard let decoded = try? matchingType.init(from: decoder) else {
                 assertionFailure("Failed to decode MatrixEvent as \(String(describing: T.self))")
                 return
             }
-            
+
             guard let decoded = decoded as? T else {
                 // something has probably gone very wrong at this stage
                 throw MatrixEventCodableError.unableToCast(decoded: decoded, into: String(describing: T.self))
             }
-            
-            self.wrappedEvent = decoded
+
+            wrappedEvent = decoded
         }
-        
-        func encode(to encoder: Encoder) throws {
+
+        func encode(to _: Encoder) throws {
             fatalError("Event encoding not implemented.")
         }
     }
-    
-    
+
     /// An initializer that allows initialization with a wrapped value of `nil`
     /// to support arrays that may be excluded in the JSON responses.
     public init(wrappedValue: Value?) {
@@ -92,11 +91,11 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
         guard let container = try? decoder.singleValueContainer(),
               let wrappers = try? container.decode([EventWrapper<Value.Element>].self)
         else { return }
-        
+
         wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
     }
-    
-    public func encode(to encoder: Encoder) throws {
+
+    public func encode(to _: Encoder) throws {
         fatalError("Event encoding not implemented.")
     }
 }

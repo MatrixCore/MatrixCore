@@ -12,7 +12,7 @@ public struct MatrixClient {
     public var urlSession: URLSession
     /// Access token used to authorize api requests
     public var accessToken: String?
-    
+
     /// An array containing all of the event types that the client should decode.
     /// By default this contains all of the events implemented within the library.
     ///
@@ -23,9 +23,9 @@ public struct MatrixClient {
         MatrixMessageEvent.self,
         MatrixNameEvent.self,
         MatrixReactionEvent.self,
-        MatrixRedactionEvent.self
+        MatrixRedactionEvent.self,
     ]
-    
+
     /// Initializes a Matrix client object with the specified parameters.
     /// - Parameters:
     ///   - homeserver: The homeserver the client should contact.
@@ -37,7 +37,6 @@ public struct MatrixClient {
         self.accessToken = accessToken
     }
 
-    
     // 2.1 GET /_matrix/client/versions
     /// Gets the versions of the specification supported by the server.
     ///
@@ -62,16 +61,16 @@ public struct MatrixClient {
         try await MatrixServerInfoRequest()
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
     }
-    
+
     /// Gets discovery information about the domain. The file may include additional keys, which MUST follow the Java package naming convention,
     /// e.g. `com.example.myapp.property`. This ensures property names are suitably namespaced for each application and reduces the risk of clashes.
     ///
     /// Note that this endpoint is not necessarily handled by the homeserver, but by another webserver, to be used for discovering the homeserver URL.
     ///
-    ///```markdown
+    /// ```markdown
     ///    Rate-limited:    No.
     ///    Requires auth:   No.
-    ///```
+    /// ```
     @available(swift, introduced: 5.5)
     public func getWellKnown() async throws -> MatrixWellKnown {
         try await MatrixWellKnownRequest()
@@ -84,5 +83,3 @@ public struct MatrixClient {
             .response(on: homeserver, withToken: accessToken, with: parameters)
     }
 }
-
-
