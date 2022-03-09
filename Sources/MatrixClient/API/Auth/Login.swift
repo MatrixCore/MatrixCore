@@ -33,7 +33,7 @@ public struct MatrixLoginFlowRequest: MatrixRequest {
 
 @frozen
 /// A login type supported by the homeserver.
-public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable {
+public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     public typealias RawValue = String
 
     public var rawValue: String
@@ -98,6 +98,7 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable {
     public static let msisdn: MatrixLoginFlow = "m.login.msisdn"
     public static let token: MatrixLoginFlow = "m.login.token"
     public static let dummy: MatrixLoginFlow = "m.login.dummy"
+    public static let terms: MatrixLoginFlow = "m.login.terms"
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

@@ -17,10 +17,14 @@ public struct MatrixRegisterRequest {
     /// The desired password for the account.
     public var password: String
 
+    /// Interactive flow response
+    public var auth: MatrixInteractiveAuthResponse?
+
     enum CodingKeys: String, CodingKey {
         case username
         case bindEmail = "bind_email"
         case password
+        case auth
     }
 }
 
@@ -35,7 +39,7 @@ extension MatrixRegisterRequest: MatrixRequest {
     public func components(for homeserver: MatrixHomeserver, with kind: RegisterKind) throws -> URLComponents {
         var components = homeserver.url
 
-        components.path = "/_matrix/client/r0/register"
+        components.path = "/_matrix/client/v3/register"
         components.queryItems = [.init(name: "kind", value: kind.rawValue)]
         return components
     }

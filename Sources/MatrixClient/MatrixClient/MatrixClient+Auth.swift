@@ -49,13 +49,15 @@ public extension MatrixClient {
     func register(
         password: String,
         username: String? = nil,
+        auth: MatrixInteractiveAuthResponse? = nil,
         bind_email: Bool? = nil,
         kind: MatrixRegisterRequest.RegisterKind = .user
     ) async throws -> MatrixRegisterContainer {
         try await MatrixRegisterRequest(
             username: username,
             bindEmail: bind_email,
-            password: password
+            password: password,
+            auth: auth
         )
         .response(on: homeserver, with: kind, withUrlSession: urlSession)
     }

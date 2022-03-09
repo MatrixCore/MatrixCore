@@ -6,6 +6,7 @@
 //
 
 import AnyCodable
+import AppKit
 import ArgumentParser
 import Foundation
 import MatrixClient
@@ -56,52 +57,79 @@ extension Mcc.Auth {
             print(register)
         }
 
-        mutating func register(logger: Logger, client: MatrixClient) async throws -> MatrixRegister {
-            let register = try await client.register(password: password!, username: userID, bind_email: false)
+        mutating func register(logger: Logger, client: MatrixClient, auth: MatrixInteractiveAuthResponse? = nil) async throws -> MatrixRegister {
+            let register = try await client.register(password: password!, username: userID, auth: auth, bind_email: false)
             switch register {
             case let .success(matrixRegister):
                 return matrixRegister
             case let .interactive(matrixInteractiveAuth):
                 session = matrixInteractiveAuth.session
 
-                logger.debug("uninished stages: \(matrixInteractiveAuth.notCompletedStages)")
+                logger.debug("completed stages: \(matrixInteractiveAuth.completed ?? [])")
+                logger.debug("unfinished stages: \(matrixInteractiveAuth.notCompletedStages)")
                 guard let (nextStage, nextStageParams) = matrixInteractiveAuth.nextStageWithParams else {
                     abort() // TODO: throw some kind of error
                 }
-                logger.info("next stage: \(nextStage)")
+                logger.info("next stage: \(nextStage.rawValue)")
                 logger.debug("next stage params: \(String(describing: nextStageParams))")
-                try await doStage(logger: logger, stage: nextStage, params: nextStageParams)
-                abort()
+                let auth = try await doStage(logger: logger, stage: nextStage, params: nextStageParams, client: client)
+                return try await self.register(logger: logger, client: client, auth: auth)
             }
         }
 
-        func doStage(logger: Logger, stage: String, params: AnyCodable?) async throws -> [String: AnyCodable] {
-            var ret: [String: AnyCodable] = [:]
-            ret["type"] = "m.login.recaptcha"
-            if let session = session {
-                ret["session"] = AnyCodable(stringLiteral: session)
-            }
-
+        func doStage(logger: Logger, stage: MatrixLoginFlow, params: AnyCodable?, client: MatrixClient) async throws -> MatrixInteractiveAuthResponse {
             switch stage {
-            case "m.login.recaptcha":
-                ret.merge(try await doRecaptcha(logger: logger, params: params)) { current, _ in current }
+            case MatrixLoginFlow.recaptcha:
+                return try await doRecaptcha(logger: logger, params: params)
+            case MatrixLoginFlow.terms:
+                return try await doTerms(logger: logger, params: params)
+            case MatrixLoginFlow.email:
+                return try await doEmail(logger: logger, params: params, client: client)
 
             default:
                 print("not implemented: \(stage)")
             }
 
-            return ret
+            throw MatrixError.NotFound // TODO: better error
         }
 
-        func doRecaptcha(logger: Logger, params: AnyCodable?) async throws -> [String: AnyCodable] {
+        func doTerms(logger: Logger, params: AnyCodable?) async throws -> MatrixInteractiveAuthResponse {
             guard let params = params,
                   let params = params.value as? [String: Any],
-                  let publicKey = params["public_key"] as? String
+                  let policies = params["policies"] as? [String: Any],
+                  let privacy_policy = policies["privacy_policy"] as? [String: Any],
+                  let privacy_policy_en = privacy_policy["en"] as? [String: Any],
+                  let urlStr = privacy_policy_en["url"] as? String,
+                  let url = URL(string: urlStr),
+                  let name = privacy_policy_en["name"] as? String
             else {
+                logger.warning("Missing policy homeserver configuration. Please report this to your homeserver administrator.")
                 throw MatrixError.NotFound
             }
-            logger.debug("recaptcha: public key: \(publicKey)")
-            return [:]
+
+            print("Pleace accept the \(name).")
+            print(url)
+            print()
+            print("Please enter Y to accept.")
+
+            NSWorkspace.shared.open(url)
+
+            let input = (readLine(strippingNewline: true) ?? "").lowercased()
+
+            let a = input.prefix(1)
+
+            if a == "y" {
+                return MatrixInteractiveAuthResponse(session: session, type: .terms)
+            } else {
+                abort()
+            }
+        }
+
+        func doEmail(logger _: Logger, params _: AnyCodable?, client: MatrixClient) async throws -> MatrixInteractiveAuthResponse {
+            let wellKnown = try await client.getWellKnown()
+            let identityServer = wellKnown.identityServerBaseUrl
+
+            abort()
         }
     }
 }
