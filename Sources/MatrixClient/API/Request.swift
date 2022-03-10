@@ -7,32 +7,43 @@
 
 import Foundation
 
+/// HTTP method to be used by ``MatrixClient/MatrixRequest``.
 public enum HttpMethod: String, CaseIterable {
     case GET
     case POST
     case PUT
     case PATCH
 
-    static var containsBody: [Self] = [.POST, .PUT, .PATCH]
+    /// Methods which contain a body to parse.
+    public static var containsBody: [Self] = [.POST, .PUT, .PATCH]
 }
 
+/// A type that can be requested on a Matrix server.
 public protocol MatrixRequest: Codable {
+    /// The type of response the Matrix server answers with on success.
     associatedtype Response: MatrixResponse
 
+    /// Type used as an extra parameter to create the request.
     associatedtype URLParameters
+
+    /// Function to create the URL to request, based on ``URLParameters``.
     func components(for homeserver: MatrixHomeserver, with parameters: URLParameters) throws -> URLComponents
 
+    /// The ``MatrixClient/HttpMethod`` used by this request.
     static var httpMethod: HttpMethod { get }
+
+    /// `True` if the request requires authentication.
     static var requiresAuth: Bool { get }
+
     // TODO: rate limited property?
 }
 
 public extension MatrixRequest {
+    /// Create the `URLRequest` to get the response data for this ``MatrixClient/MatrixRequest``.
     func request(on homeserver: MatrixHomeserver, withToken token: String? = nil,
                  with parameters: URLParameters) throws -> URLRequest
     {
         let components = try components(for: homeserver, with: parameters)
-        // components.queryItems = self.queryParameters
 
         var urlRequest = URLRequest(url: components.url!)
 
@@ -60,6 +71,9 @@ public extension MatrixRequest {
         return try Response(fromMatrixRequestData: data)
     }
 
+    /// Download the request data from the ``MatrixHomeserver``.
+    ///
+    /// The request to download the data is built via ``MatrixClient/MatrixRequest/request(on:withToken:with:)``.
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func download(
@@ -70,6 +84,17 @@ public extension MatrixRequest {
     ) async throws -> (Data, HTTPURLResponse) {
         let request = try request(on: homeserver, withToken: token, with: parameters)
 
+        return try await download(request: request, withUrlSession: urlSession)
+    }
+
+    /// Download the given request.
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    @inlinable
+    func download(
+        request: URLRequest,
+        withUrlSession urlSession: URLSession = URLSession.shared
+    ) async throws -> (Data, HTTPURLResponse) {
         let (data, urlResponse) = try await urlSession.data(for: request)
 
         guard let response = urlResponse as? HTTPURLResponse else {
@@ -79,7 +104,10 @@ public extension MatrixRequest {
         return (data, response)
     }
 
-    @available(swift, deprecated: 5.5)
+    /// Download the request data from the ``MatrixHomeserver``.
+    ///
+    /// The request to download the data is built via ``MatrixClient/MatrixRequest/request(on:withToken:with:)``.
+    @available(swift, deprecated: 5.5, renamed: "download(on:withToken:with:withUrlSession:)")
     func download(
         on homeserver: MatrixHomeserver,
         withToken token: String? = nil,
@@ -89,6 +117,17 @@ public extension MatrixRequest {
     ) throws -> URLSessionDataTask {
         let request = try request(on: homeserver, withToken: token, with: parameters)
 
+        return download(request: request, withUrlSession: urlSession, callback: callback)
+    }
+
+    /// Download the given request.
+    @available(swift, deprecated: 5.5, renamed: "download(request:withUrlSession:)")
+    @inlinable
+    func download(
+        request: URLRequest,
+        withUrlSession urlSession: URLSession = URLSession.shared,
+        callback: @escaping ((Result<(Data, HTTPURLResponse), Error>) -> Void)
+    ) -> URLSessionDataTask {
         return urlSession.dataTask(with: request) { data, response, error in
             if let error = error {
                 callback(.failure(error))
@@ -106,6 +145,7 @@ public extension MatrixRequest {
         }
     }
 
+    /// Execute the ``MatrixRequest`` returning the ``MatrixRequest/Response``.
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func response(
@@ -120,7 +160,8 @@ public extension MatrixRequest {
         return try parse(data: data, response: response)
     }
 
-    @available(swift, deprecated: 5.5)
+    /// Execute the ``MatrixRequest`` returning the ``MatrixRequest/Response``.
+    @available(swift, deprecated: 5.5, renamed: "response(on:withToken:with:withUrlSession:)")
     @available(macOS, deprecated: 12.0)
     func response(
         on homeserver: MatrixHomeserver,
@@ -146,10 +187,15 @@ public extension MatrixRequest {
     }
 }
 
-/// Protocol for a Matrix server response
 public protocol MatrixResponse: Codable {}
 
 public extension MatrixResponse {
+    /// Parse the json data into the ``MatrixResponse`` type.
+    ///
+    /// The ``MatrixRequest/parse(data:response:)`` function uses this, as this configures
+    /// the `JSONDecoder` to use the correct types.
+    ///
+    /// - Parameter fromMatrixRequestData:
     init(fromMatrixRequestData data: Data) throws {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970

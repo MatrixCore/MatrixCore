@@ -27,7 +27,7 @@ public struct MatrixSyncRequest: MatrixRequest {
         return components
     }
 
-    public typealias Response = MatrixSyncResponse
+    public typealias Response = MatrixSync
 
     public typealias URLParameters = Parameters
 
@@ -63,7 +63,7 @@ public struct MatrixSyncRequest: MatrixRequest {
     }
 }
 
-public struct MatrixSyncResponse: MatrixResponse {
+public struct MatrixSync: MatrixResponse {
     public let nextBatch: String
     public let rooms: Rooms?
     // public let presence: Presence

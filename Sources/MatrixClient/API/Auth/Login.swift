@@ -202,6 +202,7 @@ public enum MatrixLoginUserIdentifier: Codable {
     }
 }
 
+/// Login Request.
 public struct MatrixLoginRequest {
     /// The login type being used. One of: ["m.login.password", "m.login.token"]
     public var type: String
