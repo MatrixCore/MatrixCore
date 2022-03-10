@@ -17,6 +17,7 @@ public extension MatrixClient {
     ///    Requires auth:   Yes.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func setFilter(userId: String, filter: MatrixFilter) async throws -> MatrixFilterId {
         var id = try await filter
             .response(on: homeserver, withToken: accessToken, with: userId, withUrlSession: urlSession)
@@ -34,6 +35,7 @@ public extension MatrixClient {
     ///    Requires auth:   Yes.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     @inlinable
     func getFilter(userId: String, filterId: String) async throws -> MatrixFilter {
         try await getFilter(with: MatrixFilterId(user: userId, filter: filterId))
@@ -46,6 +48,7 @@ public extension MatrixClient {
     ///    Requires auth:   Yes.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getFilter(with id: MatrixFilterId) async throws -> MatrixFilter {
         try await MatrixFilterRequest()
             .response(on: homeserver, withToken: accessToken, with: id, withUrlSession: urlSession)

@@ -10,6 +10,7 @@ import Foundation
 import XCTest
 
 @available(swift, introduced: 5.5)
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 final class ApiAuthInteractiveTests: XCTestCase {
     var flow = MatrixInteractiveAuth(flows: [
         MatrixInteractiveAuth.Flow(stages: [MatrixLoginFlow.recaptcha, MatrixLoginFlow.terms, MatrixLoginFlow.email]),

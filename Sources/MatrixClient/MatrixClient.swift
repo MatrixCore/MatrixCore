@@ -61,6 +61,7 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func getVersions() async throws -> MatrixServerInfo {
         try await MatrixServerInfoRequest()
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
@@ -76,12 +77,14 @@ public struct MatrixClient {
     ///    Requires auth:   No.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func getWellKnown() async throws -> MatrixWellKnown {
         try await MatrixWellKnownRequest()
             .response(on: homeserver, with: (), withUrlSession: urlSession)
     }
 
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSyncResponse {
         try await MatrixSyncRequest()
             .response(on: homeserver, withToken: accessToken, with: parameters)

@@ -57,21 +57,7 @@ extension MatrixRegisterRequest: MatrixRequest {
     /// The kind of account to register. Defaults to user.
     public typealias URLParameters = MatrixRegisterRequest.RegisterKind
 
-    @available(swift, introduced: 5.5)
-    func response(
-        on homeserver: MatrixHomeserver,
-        withToken token: String? = nil,
-        with parameters: URLParameters,
-        withUrlSession urlSession: URLSession = URLSession.shared
-    ) async throws -> Response {
-        let request = try request(on: homeserver, withToken: token, with: parameters)
-
-        let (data, urlResponse) = try await urlSession.data(for: request)
-
-        guard let response = urlResponse as? HTTPURLResponse else {
-            throw MatrixError.Unknown
-        }
-
+    func parse(data: Data, response: HTTPURLResponse) throws -> Response {
         guard response.statusCode != 401 else {
             return try MatrixRegisterContainer.interactive(.init(fromMatrixRequestData: data))
         }
