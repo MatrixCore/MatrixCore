@@ -107,7 +107,7 @@ public extension MatrixRequest {
     /// Download the request data from the ``MatrixHomeserver``.
     ///
     /// The request to download the data is built via ``MatrixClient/MatrixRequest/request(on:withToken:with:)``.
-    @available(swift, deprecated: 5.5)
+    @available(swift, deprecated: 5.5, renamed: "download(on:withToken:with:withUrlSession:)")
     func download(
         on homeserver: MatrixHomeserver,
         withToken token: String? = nil,
@@ -121,7 +121,7 @@ public extension MatrixRequest {
     }
 
     /// Download the given request.
-    @available(swift, deprecated: 5.5)
+    @available(swift, deprecated: 5.5, renamed: "download(request:withUrlSession:)")
     @inlinable
     func download(
         request: URLRequest,
@@ -161,7 +161,7 @@ public extension MatrixRequest {
     }
 
     /// Execute the ``MatrixRequest`` returning the ``MatrixRequest/Response``.
-    @available(swift, deprecated: 5.5)
+    @available(swift, deprecated: 5.5, renamed: "response(on:withToken:with:withUrlSession:)")
     @available(macOS, deprecated: 12.0)
     func response(
         on homeserver: MatrixHomeserver,
