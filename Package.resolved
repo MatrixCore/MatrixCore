@@ -9,24 +9,6 @@
           "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
           "version": "0.6.2"
         }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser",
-        "state": {
-          "branch": "async",
-          "revision": "34aff6b87d5a788fe6441248d82db905f43c9b50",
-          "version": null
-        }
-      },
-      {
-        "package": "Swifter",
-        "repositoryURL": "https://github.com/httpswift/swifter.git",
-        "state": {
-          "branch": null,
-          "revision": "9483a5d459b45c3ffd059f7b55f9638e268632fd",
-          "version": "1.5.0"
-        }
       }
     ]
   },
