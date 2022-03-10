@@ -8,11 +8,11 @@
 @testable import MatrixClient
 import XCTest
 
-@available(swift, introduced: 5.5)
-@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 final class MatrixClientTests: XCTestCase {
     let client = MatrixClient(homeserver: MatrixHomeserver(string: "https://matrix-client.matrix.org")!)
 
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func testGetVersions() async throws {
         let version = try await client.getVersions()
 
@@ -20,6 +20,8 @@ final class MatrixClientTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(version.versions.count, 2)
     }
 
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func testGetWellKnown() async throws {
         let client = MatrixClient(homeserver: MatrixHomeserver(string: "https://matrix.org")!)
         let wellKnown = try await client.getWellKnown()
@@ -66,6 +68,8 @@ final class MatrixClientTests: XCTestCase {
         XCTAssertEqual(orig.homeServerBaseUrl, "test")
     }
 
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func testGetLoginFlows() async throws {
         let flows = try await client.getLoginFlows()
 
