@@ -39,26 +39,24 @@ public enum MatrixError: String, Error, Codable {
     case TermsNotSigned = "M_TERMS_NOT_SIGNED"
     case InvalidPepper = "M_INVALID_PEPPER"
     case Exclusive = "M_EXCLUSIVE"
-    
 }
 
 public struct MatrixServerError: Error, Codable {
     /// Error code
     public var errcode: MatrixError
-    
+
     /// Error message  reported by the server
     public var error: String
-    
+
     /// HTTP status code
     public var code: Int?
-    
+
     // TODO: extra data
-    
+
     public init(json: Data, code: Int? = nil) throws {
         let decoder = JSONDecoder()
-        
+
         self = try decoder.decode(Self.self, from: json)
         self.code = code
     }
 }
-
