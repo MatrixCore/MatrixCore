@@ -9,22 +9,24 @@ import Foundation
 
 public struct MatrixLogoutRequest: MatrixRequest {
     public typealias Response = MatrixLogout
-    
+
     public typealias URLParameters = Bool
-    
-    public func path(with all: Bool) -> String {
+
+    public func components(for homeserver: MatrixHomeserver, with all: Bool) -> URLComponents {
+        var components = homeserver.url
+
         if all {
-            return "/_matrix/client/r0/logout/all"
+            components.path = "/_matrix/client/r0/logout/all"
         } else {
-            return "/_matrix/client/r0/logout"
+            components.path = "/_matrix/client/r0/logout"
         }
+
+        return components
     }
-    
+
     public static var httpMethod = HttpMethod.POST
-    
+
     public static var requiresAuth = true
 }
 
-public struct MatrixLogout: MatrixResponse {
-    
-}
+public struct MatrixLogout: MatrixResponse {}
