@@ -9,6 +9,22 @@ import AnyCodable
 import Foundation
 
 public struct MatrixInteractiveAuth: MatrixResponse {
+    public init(
+        flows: [MatrixInteractiveAuth.Flow],
+        params: [String: AnyCodable],
+        session: String? = nil,
+        completed: [MatrixLoginFlow]? = nil,
+        error: String? = nil,
+        errcode: MatrixError? = nil
+    ) {
+        self.flows = flows
+        self.params = params
+        self.session = session
+        self.completed = completed
+        self.error = error
+        self.errcode = errcode
+    }
+
     public var flows: [Flow]
 
     /// This section contains any information that the client will need to know in order to use a given type of authentication.
@@ -70,11 +86,11 @@ public struct MatrixInteractiveAuth: MatrixResponse {
 
     /// Test if th given flow is required by every flow supported by the homeserver.
     public func isRequierd(_ flow: MatrixLoginFlow) -> Bool {
-        return flows.allSatisfy { $0.stages.contains(flow) }
+        flows.allSatisfy { $0.stages.contains(flow) }
     }
 
     public func isRequierd(notCompletedFlow flow: MatrixLoginFlow) -> Bool {
-        return notCompletedStages.allSatisfy { $0.stages.contains(flow) }
+        notCompletedStages.allSatisfy { $0.stages.contains(flow) }
     }
 
     // MARK: Struct
@@ -151,7 +167,7 @@ public extension MatrixInteractiveAuthResponse {
         // not used here, but a protocol requirement
         var intValue: Int?
         init?(intValue _: Int) {
-            return nil
+            nil
         }
     }
 

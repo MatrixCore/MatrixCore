@@ -21,7 +21,9 @@ public struct MatrixFilterId: MatrixResponse {
     }
 }
 
-public struct MatrixFilterRequest: MatrixRequest {
+public struct MatrixFilterRequest {}
+
+extension MatrixFilterRequest: MatrixRequest {
     public typealias Response = MatrixFilter
 
     public typealias URLParameters = MatrixFilterId
@@ -46,6 +48,20 @@ public struct MatrixFilterRequest: MatrixRequest {
 }
 
 public struct MatrixFilter: MatrixResponse {
+    public init(
+        eventFields: [String]? = nil,
+        eventFormat: MatrixFilter.EventFormat? = .client,
+        presence: MatrixFilter.EventFilter? = nil,
+        accountData: MatrixFilter.EventFilter? = nil,
+        room: MatrixFilter.RoomFilter? = nil
+    ) {
+        self.eventFields = eventFields
+        self.eventFormat = eventFormat
+        self.presence = presence
+        self.accountData = accountData
+        self.room = room
+    }
+
     /// List of event fields to include. If this list is absent then all fields are included. The entries may include '.'
     /// characters to indicate sub-fields. So ['content.body'] will include the 'body' field of the 'content' object.
     /// A literal '.' character in a field name may be escaped using a '\'. A server may include more fields than were requested.
@@ -77,6 +93,20 @@ public struct MatrixFilter: MatrixResponse {
     }
 
     public struct EventFilter: Codable {
+        public init(
+            limit: Int? = nil,
+            notSenders: [String]? = nil,
+            notTypes: [String]? = nil,
+            senders: [String]? = nil,
+            types: [String]? = nil
+        ) {
+            self.limit = limit
+            self.notSenders = notSenders
+            self.notTypes = notTypes
+            self.senders = senders
+            self.types = types
+        }
+
         /// The maximum number of events to return.
         public var limit: Int?
 
@@ -105,6 +135,24 @@ public struct MatrixFilter: MatrixResponse {
     }
 
     public struct RoomFilter: Codable {
+        public init(
+            notRooms: [String]? = nil,
+            rooms: [String]? = nil,
+            ephemeral: MatrixFilter.RoomFilter.RoomEventFilter? = nil,
+            includeLeave: Bool? = nil,
+            state: MatrixFilter.RoomFilter.StateFilter? = nil,
+            timeline: MatrixFilter.RoomFilter.RoomEventFilter? = nil,
+            accountData: MatrixFilter.RoomFilter.RoomEventFilter? = nil
+        ) {
+            self.notRooms = notRooms
+            self.rooms = rooms
+            self.ephemeral = ephemeral
+            self.includeLeave = includeLeave
+            self.state = state
+            self.timeline = timeline
+            self.accountData = accountData
+        }
+
         /// A list of room IDs to exclude. If this list is absent then no rooms are excluded. A matching room will be excluded
         /// even if it is listed in the '`rooms`' filter. This filter is applied before the filters in `ephemeral`, `state`, `timeline` or `account_data`
         public var notRooms: [String]?
@@ -139,6 +187,30 @@ public struct MatrixFilter: MatrixResponse {
         }
 
         public struct RoomEventFilter: Codable {
+            public init(
+                limit: Int? = nil,
+                notSenders: [String]? = nil,
+                notTypes: [String]? = nil,
+                senders: [String]? = nil,
+                types: [String]? = nil,
+                lazyLoadMembers: Bool? = nil,
+                includeRedundantMembers: Bool? = nil,
+                notRooms: [String]? = nil,
+                rooms: [String]? = nil,
+                containsUrl: Bool? = nil
+            ) {
+                self.limit = limit
+                self.notSenders = notSenders
+                self.notTypes = notTypes
+                self.senders = senders
+                self.types = types
+                self.lazyLoadMembers = lazyLoadMembers
+                self.includeRedundantMembers = includeRedundantMembers
+                self.notRooms = notRooms
+                self.rooms = rooms
+                self.containsUrl = containsUrl
+            }
+
             /// The maximum number of events to return.
             public var limit: Int?
 
@@ -189,6 +261,30 @@ public struct MatrixFilter: MatrixResponse {
         }
 
         public struct StateFilter: Codable {
+            public init(
+                limit: Int? = nil,
+                notSenders: [String]? = nil,
+                notTypes: [String]? = nil,
+                senders: [String]? = nil,
+                types: [String]? = nil,
+                lazyLoadMembers: Bool? = nil,
+                includeRedundantMembers: Bool? = nil,
+                notRooms: [String]? = nil,
+                rooms: [String]? = nil,
+                containsUrl: Bool? = nil
+            ) {
+                self.limit = limit
+                self.notSenders = notSenders
+                self.notTypes = notTypes
+                self.senders = senders
+                self.types = types
+                self.lazyLoadMembers = lazyLoadMembers
+                self.includeRedundantMembers = includeRedundantMembers
+                self.notRooms = notRooms
+                self.rooms = rooms
+                self.containsUrl = containsUrl
+            }
+
             /// The maximum number of events to return.
             public var limit: Int?
 

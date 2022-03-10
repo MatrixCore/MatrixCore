@@ -128,7 +128,7 @@ public extension MatrixRequest {
         withUrlSession urlSession: URLSession = URLSession.shared,
         callback: @escaping ((Result<(Data, HTTPURLResponse), Error>) -> Void)
     ) -> URLSessionDataTask {
-        return urlSession.dataTask(with: request) { data, response, error in
+        urlSession.dataTask(with: request) { data, response, error in
             if let error = error {
                 callback(.failure(error))
                 return
@@ -170,7 +170,7 @@ public extension MatrixRequest {
         withUrlSession urlSession: URLSession = URLSession.shared,
         callback: @escaping ((Result<Response, Error>) -> Void)
     ) throws -> URLSessionDataTask {
-        return try download(on: homeserver, withToken: token, with: parameters, withUrlSession: urlSession) { resp in
+        try download(on: homeserver, withToken: token, with: parameters, withUrlSession: urlSession) { resp in
             switch resp {
             case let .success((data, response)):
                 do {

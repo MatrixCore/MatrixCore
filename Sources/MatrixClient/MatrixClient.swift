@@ -71,7 +71,7 @@ public struct MatrixClient {
     public func getVersions(callback: @escaping ((Result<MatrixServerInfo, Error>) -> Void)) throws
         -> URLSessionDataTask
     {
-        return try MatrixServerInfoRequest()
+        try MatrixServerInfoRequest()
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession, callback: callback)
     }
 
@@ -95,7 +95,7 @@ public struct MatrixClient {
     public func getWellKnown(callback: @escaping ((Result<MatrixWellKnown, Error>) -> Void)) throws
         -> URLSessionDataTask
     {
-        return try MatrixWellKnownRequest().response(on: homeserver, with: (), callback: callback)
+        try MatrixWellKnownRequest().response(on: homeserver, with: (), callback: callback)
     }
 
     @available(swift, introduced: 5.5)
@@ -110,7 +110,7 @@ public struct MatrixClient {
         paramters: MatrixSyncRequest.Parameters,
         callback: @escaping ((Result<MatrixSync, Error>) -> Void)
     ) throws -> URLSessionDataTask {
-        return try MatrixSyncRequest()
+        try MatrixSyncRequest()
             .response(
                 on: homeserver,
                 withToken: accessToken,

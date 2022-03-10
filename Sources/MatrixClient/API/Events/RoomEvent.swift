@@ -28,7 +28,7 @@ enum MatrixEventCodableError: Error {
 extension KeyedDecodingContainer {
     // The synthesized decoding for MatrixCodableEvents will throw if the key is missing. This fixes that.
     func decode<T>(_ type: MatrixCodableEvents<T>.Type, forKey key: Self.Key) throws -> MatrixCodableEvents<T> {
-        return try decodeIfPresent(type, forKey: key) ?? MatrixCodableEvents<T>(wrappedValue: nil)
+        try decodeIfPresent(type, forKey: key) ?? MatrixCodableEvents<T>(wrappedValue: nil)
     }
 }
 

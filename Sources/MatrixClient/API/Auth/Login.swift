@@ -7,7 +7,17 @@
 
 import Foundation
 
-public struct MatrixLoginFlowRequest: MatrixRequest {
+public struct MatrixLoginFlowRequest {
+    public struct ResponseStruct: MatrixResponse {
+        var flows: [FlowType]
+
+        struct FlowType: Codable {
+            var type: MatrixLoginFlow
+        }
+    }
+}
+
+extension MatrixLoginFlowRequest: MatrixRequest {
     public typealias Response = Self.ResponseStruct
 
     public typealias URLParameters = ()
@@ -21,14 +31,6 @@ public struct MatrixLoginFlowRequest: MatrixRequest {
     public static var httpMethod = HttpMethod.GET
 
     public static var requiresAuth = false
-
-    public struct ResponseStruct: MatrixResponse {
-        var flows: [FlowType]
-
-        struct FlowType: Codable {
-            var type: MatrixLoginFlow
-        }
-    }
 }
 
 @frozen
@@ -111,6 +113,10 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     }
 
     public init?(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    public init(_ rawValue: String) {
         self.rawValue = rawValue
     }
 }
@@ -204,6 +210,28 @@ public enum MatrixLoginUserIdentifier: Codable {
 
 /// Login Request.
 public struct MatrixLoginRequest {
+    public init(
+        type: String,
+        identifier: MatrixLoginUserIdentifier? = nil,
+        user: String? = nil,
+        medium: String? = nil,
+        address: String? = nil,
+        password: String? = nil,
+        token: String? = nil,
+        deviceId: String? = nil,
+        initialDeviceDisplayName: String? = nil
+    ) {
+        self.type = type
+        self.identifier = identifier
+        self.user = user
+        self.medium = medium
+        self.address = address
+        self.password = password
+        self.token = token
+        self.deviceId = deviceId
+        self.initialDeviceDisplayName = initialDeviceDisplayName
+    }
+
     /// The login type being used. One of: ["m.login.password", "m.login.token"]
     public var type: String
 
@@ -265,6 +293,20 @@ extension MatrixLoginRequest: MatrixRequest {
 }
 
 public struct MatrixLogin: MatrixResponse {
+    public init(
+        userId: String? = nil,
+        accessToken: String? = nil,
+        homeServer: String? = nil,
+        deviceId: String? = nil,
+        wellKnown: MatrixWellKnown? = nil
+    ) {
+        self.userId = userId
+        self.accessToken = accessToken
+        self.homeServer = homeServer
+        self.deviceId = deviceId
+        self.wellKnown = wellKnown
+    }
+
     /// The fully-qualified Matrix ID that has been registered.
     public var userId: String?
 

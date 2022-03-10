@@ -8,6 +8,18 @@
 import Foundation
 
 public struct MatrixRegisterRequest {
+    public init(
+        username: String? = nil,
+        bindEmail: Bool? = nil,
+        password: String,
+        auth: MatrixInteractiveAuthResponse? = nil
+    ) {
+        self.username = username
+        self.bindEmail = bindEmail
+        self.password = password
+        self.auth = auth
+    }
+
     /// The local part of the desired Matrix ID. If omitted, the homeserver MUST generate a Matrix ID local part.
     public var username: String?
 
@@ -71,6 +83,13 @@ extension MatrixRegisterRequest: MatrixRequest {
 }
 
 public struct MatrixRegister: MatrixResponse {
+    public init(accessToken: String, homeServer: String, refreshToken: String? = nil, userID: String) {
+        self.accessToken = accessToken
+        self.homeServer = homeServer
+        self.refreshToken = refreshToken
+        self.userID = userID
+    }
+
     /// An access token for the account. This access token can then be used to authorize other requests.
     /// The access token may expire at some point, and if so, it SHOULD come with a refresh_token.
     /// There is no specific error message to indicate that a request has failed because an access token has
@@ -102,6 +121,12 @@ public enum MatrixRegisterContainer: MatrixResponse {
 }
 
 public struct MatrixRegisterRequestEmailTokenRequest: MatrixRequest {
+    public init(clientSecret: String, email: String, sendAttempt: Int = 0) {
+        self.clientSecret = clientSecret
+        self.email = email
+        self.sendAttempt = sendAttempt
+    }
+
     public var clientSecret: String
 
     public var email: String
@@ -142,5 +167,9 @@ public extension MatrixRegisterRequestEmailTokenRequest {
 }
 
 public struct MatrixRegisterRequestEmailToken: MatrixResponse {
+    public init(sid: String) {
+        self.sid = sid
+    }
+
     public var sid: String
 }

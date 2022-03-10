@@ -11,6 +11,10 @@ import Foundation
 public struct MatrixHomeserver: Codable {
     public var url: URLComponents
 
+    public init(url: URLComponents) {
+        self.url = url
+    }
+
     public init?(string: String) {
         guard
             let components = URLComponents(string: string),
@@ -51,7 +55,8 @@ public struct MatrixHomeserver: Codable {
     }
 }
 
-public struct MatrixServerInfoRequest: MatrixRequest {
+public struct MatrixServerInfoRequest {}
+extension MatrixServerInfoRequest: MatrixRequest {
     public typealias Response = MatrixServerInfo
 
     public typealias URLParameters = ()
@@ -68,6 +73,11 @@ public struct MatrixServerInfoRequest: MatrixRequest {
 }
 
 public struct MatrixServerInfo: MatrixResponse {
+    public init(versions: [String], unstableFeatures: [String: Bool]? = nil) {
+        self.versions = versions
+        self.unstableFeatures = unstableFeatures
+    }
+
     /// The supported versions.
     public var versions: [String]
 
@@ -98,6 +108,16 @@ public struct MatrixWellKnownRequest: MatrixRequest {
 }
 
 public struct MatrixWellKnown: MatrixResponse {
+    public init(
+        homeserver: MatrixWellKnown.ServerInformation? = nil,
+        identityServer: MatrixWellKnown.ServerInformation? = nil,
+        extraInfo: [String: AnyCodable]
+    ) {
+        self.homeserver = homeserver
+        self.identityServer = identityServer
+        self.extraInfo = extraInfo
+    }
+
     /// Used by clients to discover homeserver information.
     public var homeserver: ServerInformation?
 
@@ -154,7 +174,7 @@ extension MatrixWellKnown: Codable {
         // not used here, but a protocol requirement
         var intValue: Int?
         init?(intValue _: Int) {
-            return nil
+            nil
         }
     }
 

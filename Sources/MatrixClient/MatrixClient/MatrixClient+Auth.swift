@@ -138,7 +138,7 @@ public extension MatrixClient {
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func login(request: MatrixLoginRequest) async throws -> MatrixLogin {
-        return try await request
+        try await request
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
     }
 
@@ -178,7 +178,7 @@ public extension MatrixClient {
     func logout(all: Bool = false,
                 callback: @escaping ((Result<MatrixLogout, Error>) -> Void)) throws -> URLSessionDataTask
     {
-        return try MatrixLogoutRequest()
+        try MatrixLogoutRequest()
             .response(on: homeserver, withToken: accessToken, with: all, withUrlSession: urlSession, callback: callback)
     }
 
