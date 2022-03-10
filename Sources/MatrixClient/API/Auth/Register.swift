@@ -58,7 +58,12 @@ extension MatrixRegisterRequest: MatrixRequest {
     public typealias URLParameters = MatrixRegisterRequest.RegisterKind
 
     @available(swift, introduced: 5.5)
-    func response(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters, withUrlSession urlSession: URLSession = URLSession.shared) async throws -> Response {
+    func response(
+        on homeserver: MatrixHomeserver,
+        withToken token: String? = nil,
+        with parameters: URLParameters,
+        withUrlSession urlSession: URLSession = URLSession.shared
+    ) async throws -> Response {
         let request = try request(on: homeserver, withToken: token, with: parameters)
 
         let (data, urlResponse) = try await urlSession.data(for: request)
@@ -104,7 +109,52 @@ public struct MatrixRegister: MatrixResponse {
     }
 }
 
+/// Container to either hold a successfully register answer, or an answer to do it interactivly.
 public enum MatrixRegisterContainer: MatrixResponse {
     case success(MatrixRegister)
     case interactive(MatrixInteractiveAuth)
+}
+
+public struct MatrixRegisterRequestEmailTokenRequest: MatrixRequest {
+    public var clientSecret: String
+
+    public var email: String
+
+    public var sendAttempt: Int = 0
+
+    public static func generateClientSecret() -> String {
+        UUID().uuidString
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case clientSecret = "client_secret"
+        case email
+        case sendAttempt = "send_attempt"
+    }
+}
+
+public extension MatrixRegisterRequestEmailTokenRequest {
+    func components(for homeserver: MatrixHomeserver, with _: ()) throws -> URLComponents {
+        var components = homeserver.url
+
+        components.path = "/_matrix/client/r0/register/email/requestToken"
+        return components
+    }
+
+    static var httpMethod: HttpMethod {
+        .POST
+    }
+
+    static var requiresAuth: Bool {
+        false
+    }
+
+    typealias Response = MatrixRegisterRequestEmailToken
+
+    /// The kind of account to register. Defaults to user.
+    typealias URLParameters = ()
+}
+
+public struct MatrixRegisterRequestEmailToken: MatrixResponse {
+    public var sid: String
 }

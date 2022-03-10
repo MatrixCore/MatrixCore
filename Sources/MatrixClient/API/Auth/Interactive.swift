@@ -87,6 +87,17 @@ public struct MatrixInteractiveAuthResponse: Codable {
         self.session = session
         extraInfo = ["response": AnyCodable(stringLiteral: recaptchaResponse)]
     }
+
+    public init(emailClientSecret clientSecret: String, emailSID sid: String, session: String? = nil) {
+        type = MatrixLoginFlow.email
+        self.session = session
+        extraInfo = [
+            "threepid_creds": [
+                "client_secret": clientSecret,
+                "sid": sid,
+            ],
+        ] as [String: AnyCodable]
+    }
 }
 
 public extension MatrixInteractiveAuthResponse {
@@ -121,7 +132,10 @@ public extension MatrixInteractiveAuthResponse {
         let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
-            let decoded = try extraContainer.decode(AnyCodable.self, forKey: DynamicCodingKeys(stringValue: key.stringValue)!)
+            let decoded = try extraContainer.decode(
+                AnyCodable.self,
+                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+            )
             self.extraInfo[key.stringValue] = decoded
         }
     }

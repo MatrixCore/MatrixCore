@@ -166,7 +166,10 @@ extension MatrixWellKnown: Codable {
         let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
         for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
-            let decoded = try extraContainer.decode(AnyCodable.self, forKey: DynamicCodingKeys(stringValue: key.stringValue)!)
+            let decoded = try extraContainer.decode(
+                AnyCodable.self,
+                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+            )
             self.extraInfo[key.stringValue] = decoded
         }
     }

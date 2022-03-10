@@ -28,7 +28,9 @@ public protocol MatrixRequest: Codable {
 }
 
 public extension MatrixRequest {
-    func request(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters) throws -> URLRequest {
+    func request(on homeserver: MatrixHomeserver, withToken token: String? = nil,
+                 with parameters: URLParameters) throws -> URLRequest
+    {
         let components = try components(for: homeserver, with: parameters)
         // components.queryItems = self.queryParameters
 
@@ -50,7 +52,12 @@ public extension MatrixRequest {
     }
 
     @available(swift, introduced: 5.5)
-    func response(on homeserver: MatrixHomeserver, withToken token: String? = nil, with parameters: URLParameters, withUrlSession urlSession: URLSession = URLSession.shared) async throws -> Response {
+    func response(
+        on homeserver: MatrixHomeserver,
+        withToken token: String? = nil,
+        with parameters: URLParameters,
+        withUrlSession urlSession: URLSession = URLSession.shared
+    ) async throws -> Response {
         let request = try request(on: homeserver, withToken: token, with: parameters)
 
         let (data, urlResponse) = try await urlSession.data(for: request)

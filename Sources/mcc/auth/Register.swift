@@ -31,6 +31,10 @@ extension Mcc.Auth {
         /// Session key for interactive login
         var session: String?
 
+        var emailClientSecret: String = MatrixRegisterRequestEmailTokenRequest.generateClientSecret()
+        var emailSid: String?
+        var email: String?
+
         mutating func run() async throws {
             let logger = Logger()
             let client = await MatrixClient(homeserver: try MatrixHomeserver(resolve: homeserver))
@@ -57,8 +61,15 @@ extension Mcc.Auth {
             print(register)
         }
 
-        mutating func register(logger: Logger, client: MatrixClient, auth: MatrixInteractiveAuthResponse? = nil) async throws -> MatrixRegister {
-            let register = try await client.register(password: password!, username: userID, auth: auth, bind_email: false)
+        mutating func register(logger: Logger, client: MatrixClient,
+                               auth: MatrixInteractiveAuthResponse? = nil) async throws -> MatrixRegister
+        {
+            let register = try await client.register(
+                password: password!,
+                username: userID,
+                auth: auth,
+                bind_email: false
+            )
             switch register {
             case let .success(matrixRegister):
                 return matrixRegister
@@ -77,7 +88,9 @@ extension Mcc.Auth {
             }
         }
 
-        func doStage(logger: Logger, stage: MatrixLoginFlow, params: AnyCodable?, client: MatrixClient) async throws -> MatrixInteractiveAuthResponse {
+        mutating func doStage(logger: Logger, stage: MatrixLoginFlow, params: AnyCodable?,
+                              client: MatrixClient) async throws -> MatrixInteractiveAuthResponse
+        {
             switch stage {
             case MatrixLoginFlow.recaptcha:
                 return try await doRecaptcha(logger: logger, params: params)
@@ -103,7 +116,10 @@ extension Mcc.Auth {
                   let url = URL(string: urlStr),
                   let name = privacy_policy_en["name"] as? String
             else {
-                logger.warning("Missing policy homeserver configuration. Please report this to your homeserver administrator.")
+                logger
+                    .warning(
+                        "Missing policy homeserver configuration. Please report this to your homeserver administrator."
+                    )
                 throw MatrixError.NotFound
             }
 
@@ -125,11 +141,33 @@ extension Mcc.Auth {
             }
         }
 
-        func doEmail(logger _: Logger, params _: AnyCodable?, client: MatrixClient) async throws -> MatrixInteractiveAuthResponse {
-            let wellKnown = try await client.getWellKnown()
-            let identityServer = wellKnown.identityServerBaseUrl
+        mutating func doEmail(logger: Logger, params: AnyCodable?,
+                              client: MatrixClient) async throws -> MatrixInteractiveAuthResponse
+        {
+            guard let emailSid = self.emailSid else {
+                return try await doEmailInit(logger: logger, params: params, client: client)
+            }
 
-            abort()
+            try await Task.sleep(nanoseconds: 3 * 1000 * 1000 * 1000) // Poll every three seconds
+
+            return .init(emailClientSecret: emailClientSecret, emailSID: emailSid, session: session)
+        }
+
+        mutating func doEmailInit(logger: Logger, params _: AnyCodable?,
+                                  client: MatrixClient) async throws -> MatrixInteractiveAuthResponse
+        {
+            print("Please enter email for verification: ")
+            guard let email = readLine(strippingNewline: true) else {
+                print("No email provided.")
+                abort()
+            }
+            self.email = email
+            logger.debug("using email \"\(email)\" for 3pid auth.")
+
+            let email_token_request = try await client.requestEmailToken(clientSecret: emailClientSecret, email: email)
+            emailSid = email_token_request.sid
+
+            return .init(emailClientSecret: emailClientSecret, emailSID: emailSid!, session: session)
         }
     }
 }

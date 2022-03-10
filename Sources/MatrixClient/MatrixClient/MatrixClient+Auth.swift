@@ -62,6 +62,19 @@ public extension MatrixClient {
         .response(on: homeserver, with: kind, withUrlSession: urlSession)
     }
 
+    func requestEmailToken(
+        clientSecret: String,
+        email: String,
+        sendAttempt: Int = 0
+    ) async throws -> MatrixRegisterRequestEmailToken {
+        try await MatrixRegisterRequestEmailTokenRequest(
+            clientSecret: clientSecret,
+            email: email,
+            sendAttempt: sendAttempt
+        )
+        .response(on: homeserver, with: (), withUrlSession: urlSession)
+    }
+
     // MARK: - Login
 
     /// Authenticates the user, and issues an access token they can use to authorize themself in subsequent requests.

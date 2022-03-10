@@ -31,7 +31,11 @@ public struct MatrixClient {
     ///   - homeserver: The homeserver the client should contact.
     ///   - urlSession: An optional `URLSession` to use for requests. A new session is created if `nil`.
     ///   - accessToken: An optional access token to use for requests if already logged in.
-    public init(homeserver: MatrixHomeserver, urlSession: URLSession = URLSession(configuration: .default), accessToken: String? = nil) {
+    public init(
+        homeserver: MatrixHomeserver,
+        urlSession: URLSession = URLSession(configuration: .default),
+        accessToken: String? = nil
+    ) {
         self.homeserver = homeserver
         self.urlSession = urlSession
         self.accessToken = accessToken

@@ -18,7 +18,10 @@ extension Mcc.Auth.Register {
               let params = params.value as? [String: Any],
               let publicKey = params["public_key"] as? String
         else {
-            logger.warning("Missing captcha public key in homeserver configuration. Please report this to your homeserver administrator.")
+            logger
+                .warning(
+                    "Missing captcha public key in homeserver configuration. Please report this to your homeserver administrator."
+                )
             throw MatrixError.NotFound
         }
         logger.debug("recaptcha: public key: \(publicKey)")

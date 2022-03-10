@@ -271,7 +271,11 @@ public struct MatrixLogin: MatrixResponse {
     public var accessToken: String?
 
     /// The server_name of the homeserver on which the account has been registered.
-    @available(*, deprecated, message: "Clients should extract the server_name from userId (by splitting at the first colon) if they require it.")
+    @available(
+        *,
+        deprecated,
+        message: "Clients should extract the server_name from userId (by splitting at the first colon) if they require it."
+    )
     public var homeServer: String?
 
     /// ID of the logged-in device. Will be the same as the corresponding parameter in the request, if one was specified.
