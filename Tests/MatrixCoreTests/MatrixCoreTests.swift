@@ -1,5 +1,5 @@
-import XCTest
 @testable import MatrixCore
+import XCTest
 
 final class MatrixCoreTests: XCTestCase {
     func testExample() throws {

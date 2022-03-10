@@ -25,6 +25,8 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     public var error: String?
     public var errcode: MatrixError?
 
+    // MARK: Dynamic vars
+
     public var notCompletedStages: [Flow] {
         var ret: [Flow] = []
         for flow in flows {
@@ -39,18 +41,43 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         return ret
     }
 
+    /// Return the next stage, which did not yet complete, from the first login flow
     public var nextStage: MatrixLoginFlow? {
         notCompletedStages[0].stages[0]
     }
 
-    public var nextStageWithParams: (MatrixLoginFlow, AnyCodable?)? {
+    /// Return the next stage, which did not yet complete, from the ferst login flow with the optional parameters.
+    public var nextStageWithParams: LoginFlowWithParams? {
         guard let nextStage = nextStage else {
             return nil
         }
 
         let params = params[nextStage.rawValue]
-        return (nextStage, params)
+        return LoginFlowWithParams(flow: nextStage, params: params)
     }
+
+    // MARK: Functions
+
+    /// Test if the given login flow is supported by the home server.
+    /// This returns true, the flow is contained in one or more stages.  This means the flow could be required.
+    public func isOptional(_ flow: MatrixLoginFlow) -> Bool {
+        flows.first { $0.stages.contains(flow) } != nil
+    }
+
+    public func isOptional(notCompletedFlow flow: MatrixLoginFlow) -> Bool {
+        notCompletedStages.first { $0.stages.contains(flow) } != nil
+    }
+
+    /// Test if th given flow is required by every flow supported by the homeserver.
+    public func isRequierd(_ flow: MatrixLoginFlow) -> Bool {
+        return flows.allSatisfy { $0.stages.contains(flow) }
+    }
+
+    public func isRequierd(notCompletedFlow flow: MatrixLoginFlow) -> Bool {
+        return notCompletedStages.allSatisfy { $0.stages.contains(flow) }
+    }
+
+    // MARK: Struct
 
     enum CodingKeys: String, CodingKey {
         case session
@@ -59,6 +86,11 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         case completed
         case error
         case errcode
+    }
+
+    public struct LoginFlowWithParams {
+        public let flow: MatrixLoginFlow
+        public let params: AnyCodable?
     }
 }
 

@@ -78,12 +78,17 @@ extension Mcc.Auth {
 
                 logger.debug("completed stages: \(matrixInteractiveAuth.completed ?? [])")
                 logger.debug("unfinished stages: \(matrixInteractiveAuth.notCompletedStages)")
-                guard let (nextStage, nextStageParams) = matrixInteractiveAuth.nextStageWithParams else {
+                guard let nextStage = matrixInteractiveAuth.nextStageWithParams else {
                     abort() // TODO: throw some kind of error
                 }
-                logger.info("next stage: \(nextStage.rawValue)")
-                logger.debug("next stage params: \(String(describing: nextStageParams))")
-                let auth = try await doStage(logger: logger, stage: nextStage, params: nextStageParams, client: client)
+                logger.info("next stage: \(nextStage.flow.rawValue)")
+                logger.debug("next stage params: \(String(describing: nextStage.params))")
+                let auth = try await doStage(
+                    logger: logger,
+                    stage: nextStage.flow,
+                    params: nextStage.params,
+                    client: client
+                )
                 return try await self.register(logger: logger, client: client, auth: auth)
             }
         }
