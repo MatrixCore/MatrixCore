@@ -145,6 +145,8 @@ public extension MatrixClient {
     // MARK: - Logout
 
     // 5.5.3 POST /_matrix/client/r0/logout
+    /// Logout the access token.
+    ///
     /// Invalidates an existing access token, so that it can no longer be used for authorization. The device associated with the
     /// access token is also deleted. [Device keys](https://matrix.org/docs/spec/client_server/latest#device-keys) for the device
     /// are deleted alongside the device.
@@ -161,6 +163,27 @@ public extension MatrixClient {
             .response(on: homeserver, withToken: accessToken, with: all, withUrlSession: urlSession)
     }
 
+    /// Logout the access token.
+    ///
+    /// Invalidates an existing access token, so that it can no longer be used for authorization. The device associated with the
+    /// access token is also deleted. [Device keys](https://matrix.org/docs/spec/client_server/latest#device-keys) for the device
+    /// are deleted alongside the device.
+    ///
+    ///
+    /// ```markdown
+    ///    Rate-limited:    No.
+    ///    Requires auth:   Yes.
+    /// ```
+    @available(swift, deprecated: 5.5, renamed: "logout(all:)")
+    func logout(all: Bool = false,
+                callback: @escaping ((Result<MatrixLogout, Error>) -> Void)) throws -> URLSessionDataTask
+    {
+        return try MatrixLogoutRequest()
+            .response(on: homeserver, withToken: accessToken, with: all, withUrlSession: urlSession, callback: callback)
+    }
+
+    /// Logout all tokens.
+    ///
     /// Invalidates all access tokens for a user, so that they can no longer be used for authorization. This includes the access token that made this request.
     /// All devices for the user are also deleted. [Device keys](https://matrix.org/docs/spec/client_server/latest#device-keys) for
     /// the device are deleted alongside the device.

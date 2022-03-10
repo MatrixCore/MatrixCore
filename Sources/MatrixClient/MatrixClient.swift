@@ -67,6 +67,14 @@ public struct MatrixClient {
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
     }
 
+    @available(swift, deprecated: 5.5, renamed: "getVersions()")
+    public func getVersions(callback: @escaping ((Result<MatrixServerInfo, Error>) -> Void)) throws
+        -> URLSessionDataTask
+    {
+        return try MatrixServerInfoRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession, callback: callback)
+    }
+
     /// Gets discovery information about the domain. The file may include additional keys, which MUST follow the Java package naming convention,
     /// e.g. `com.example.myapp.property`. This ensures property names are suitably namespaced for each application and reduces the risk of clashes.
     ///
@@ -83,10 +91,32 @@ public struct MatrixClient {
             .response(on: homeserver, with: (), withUrlSession: urlSession)
     }
 
+    @available(swift, deprecated: 5.5, renamed: "getWellKnown()")
+    public func getWellKnown(callback: @escaping ((Result<MatrixWellKnown, Error>) -> Void)) throws
+        -> URLSessionDataTask
+    {
+        return try MatrixWellKnownRequest().response(on: homeserver, with: (), callback: callback)
+    }
+
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSync {
         try await MatrixSyncRequest()
-            .response(on: homeserver, withToken: accessToken, with: parameters)
+            .response(on: homeserver, withToken: accessToken, with: parameters, withUrlSession: urlSession)
+    }
+
+    @available(swift, deprecated: 5.5, renamed: "sync(paramters:)")
+    public func sync(
+        paramters: MatrixSyncRequest.Parameters,
+        callback: @escaping ((Result<MatrixSync, Error>) -> Void)
+    ) throws -> URLSessionDataTask {
+        return try MatrixSyncRequest()
+            .response(
+                on: homeserver,
+                withToken: accessToken,
+                with: paramters,
+                withUrlSession: urlSession,
+                callback: callback
+            )
     }
 }
