@@ -14,8 +14,7 @@ To resolve the homeserver url you need to init ``MatrixHomeserver`` with
 let homeserver = try await MatrixHomeserver(resolve: "https://matrix.org/")
 ```
 
-## Topics
+## See Also
 
-### Relationship
 - ``MatrixClient/MatrixHomeserver``
 - ``MatrixClient/MatrixClient``
