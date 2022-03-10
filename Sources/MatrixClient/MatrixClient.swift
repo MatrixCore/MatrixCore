@@ -85,7 +85,7 @@ public struct MatrixClient {
 
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
-    public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSyncResponse {
+    public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSync {
         try await MatrixSyncRequest()
             .response(on: homeserver, withToken: accessToken, with: parameters)
     }
