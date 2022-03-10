@@ -17,6 +17,7 @@ public extension MatrixClient {
     ///    Requires auth:   No.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getLoginFlows() async throws -> [MatrixLoginFlow] {
         try await MatrixLoginFlowRequest()
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
@@ -25,6 +26,7 @@ public extension MatrixClient {
 
     /// Test if the server supports password authentication.
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func supportsPasswordAuth() async throws -> Bool {
         let flows = try await getLoginFlows()
         return flows.contains(where: { $0 == MatrixLoginFlow.password })
@@ -33,6 +35,7 @@ public extension MatrixClient {
     // MARK: - Register
 
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRegisterFlows(kind: MatrixRegisterRequest.RegisterKind = .user) async throws -> MatrixInteractiveAuth {
         let resp = try await MatrixRegisterRequest(password: "")
             .response(on: homeserver, with: kind, withUrlSession: urlSession)
@@ -46,6 +49,7 @@ public extension MatrixClient {
     }
 
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func register(
         password: String,
         username: String? = nil,
@@ -62,6 +66,8 @@ public extension MatrixClient {
         .response(on: homeserver, with: kind, withUrlSession: urlSession)
     }
 
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func requestEmailToken(
         clientSecret: String,
         email: String,
@@ -89,6 +95,7 @@ public extension MatrixClient {
     ///    Requires auth:   No.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func login(
         token: Bool = false,
         username: String,
@@ -129,6 +136,7 @@ public extension MatrixClient {
     ///    Requires auth:   No.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func login(request: MatrixLoginRequest) async throws -> MatrixLogin {
         return try await request
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
@@ -147,6 +155,7 @@ public extension MatrixClient {
     ///    Requires auth:   Yes.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func logout(all: Bool = false) async throws {
         _ = try await MatrixLogoutRequest()
             .response(on: homeserver, withToken: accessToken, with: all, withUrlSession: urlSession)
@@ -165,6 +174,7 @@ public extension MatrixClient {
     ///    Requires auth:   Yes.
     /// ```
     @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func logoutAll() async throws {
         try await logout(all: true)
     }

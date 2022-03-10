@@ -9,6 +9,7 @@
 import XCTest
 
 @available(swift, introduced: 5.5)
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 final class MatrixClientTests: XCTestCase {
     let client = MatrixClient(homeserver: MatrixHomeserver(string: "https://matrix-client.matrix.org")!)
 
