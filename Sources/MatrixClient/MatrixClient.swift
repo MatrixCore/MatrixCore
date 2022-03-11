@@ -98,6 +98,33 @@ public struct MatrixClient {
         try MatrixWellKnownRequest().response(on: homeserver, with: (), callback: callback)
     }
 
+    /// Gets information about the server’s supported feature set and other relevant capabilities.
+    ///
+    /// ```markdown
+    ///    Rate-limited:    Yes.
+    ///    Requires auth:   Yes.
+    /// ```
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    public func getCapabilities() async throws -> MatrixCapabilities {
+        try await MatrixCapabilitiesRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
+    }
+
+    /// Gets information about the server’s supported feature set and other relevant capabilities.
+    ///
+    /// ```markdown
+    ///    Rate-limited:    Yes.
+    ///    Requires auth:   Yes.
+    /// ```
+    @available(swift, deprecated: 5.5, renamed: "getCapabilities()")
+    public func getCapabilities(callback: @escaping ((Result<MatrixCapabilities, Error>) -> Void)) throws
+        -> URLSessionDataTask
+    {
+        try MatrixCapabilitiesRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession, callback: callback)
+    }
+
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSync {
