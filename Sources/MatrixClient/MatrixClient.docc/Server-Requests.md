@@ -44,6 +44,7 @@ Protocols ``MatrixClient/MatrixRequest`` and ``MatrixClient/MatrixResponse``
 - ``MatrixClient/MatrixLoginFlowRequest``
 - ``MatrixClient/MatrixServerInfo``
 - ``MatrixClient/MatrixSyncRequest``
+- ``MatrixClient/MatrixCapabilitiesRequest``
 
 ### Responses
 - ``MatrixClient/MatrixLogin``
@@ -52,6 +53,7 @@ Protocols ``MatrixClient/MatrixRequest`` and ``MatrixClient/MatrixResponse``
 - ``MatrixClient/MatrixLogout``
 - ``MatrixClient/MatrixServerInfoRequest``
 - ``MatrixClient/MatrixSync``
+- ``MatrixClient/MatrixCapabilities``
 
 ### Error
 - ``MatrixClient/MatrixServerError``
