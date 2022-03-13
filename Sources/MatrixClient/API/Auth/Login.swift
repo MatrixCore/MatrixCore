@@ -213,6 +213,22 @@ public struct MatrixLoginRequest {
     public init(
         type: String,
         identifier: MatrixLoginUserIdentifier? = nil,
+        password: String? = nil,
+        token: String? = nil,
+        deviceId: String? = nil,
+        initialDeviceDisplayName: String? = nil
+    ) {
+        self.type = type
+        self.identifier = identifier
+        self.password = password
+        self.token = token
+        self.deviceId = deviceId
+        self.initialDeviceDisplayName = initialDeviceDisplayName
+    }
+
+    @available(*, deprecated, renamed: "init(type:identifier:password:token:deviceId:initialDeviceDisplayName:)")
+    public init(
+        type: String,
         user: String? = nil,
         medium: String? = nil,
         address: String? = nil,
@@ -222,7 +238,6 @@ public struct MatrixLoginRequest {
         initialDeviceDisplayName: String? = nil
     ) {
         self.type = type
-        self.identifier = identifier
         self.user = user
         self.medium = medium
         self.address = address
@@ -310,7 +325,7 @@ public struct MatrixLogin: MatrixResponse {
     /// The fully-qualified Matrix ID that has been registered.
     public var userId: String?
 
-    /// An access token for the account. This access token can then be used to authorize other requests.
+    /// An access token for the account. This access token can then be used to authorise other requests.
     public var accessToken: String?
 
     /// The server_name of the homeserver on which the account has been registered.
