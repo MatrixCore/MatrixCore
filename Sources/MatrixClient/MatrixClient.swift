@@ -25,6 +25,7 @@ public struct MatrixClient {
         MatrixNameEvent.self,
         MatrixReactionEvent.self,
         MatrixRedactionEvent.self,
+        MatrixRoomCreateEvent.self,
     ]
 
     @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
