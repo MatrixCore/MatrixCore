@@ -36,7 +36,7 @@ public struct MatrixCapabilities: MatrixResponse {
 public extension MatrixCapabilities {
     struct Capabilities: Codable {
         public init(
-            changePassword: MatrixCapabilities.Capabilities.ChangePasswordCapability? = nil,
+            changePassword: MatrixCapabilities.Capabilities.BooleanCapability? = nil,
             roomVersions: MatrixCapabilities.Capabilities.RoomVersionsCapability? = nil,
             extraInfo: [String: AnyCodable] = [:]
         ) {
@@ -46,7 +46,61 @@ public extension MatrixCapabilities {
         }
 
         /// Capability to indicate if the user can change their password.
-        public var changePassword: ChangePasswordCapability?
+        ///
+        /// This capability has a single flag, enabled, which indicates whether or not the user can use
+        /// the /account/password API to change their password. If not present, the client should
+        /// assume that password changes are possible via the API. When present, clients SHOULD
+        /// respect the capability’s enabled flag and indicate to the user if they are unable to change their password.
+        ///
+        /// # Example
+        /// ```swift
+        /// let changePasswordCapability = BooleanCapability(
+        ///     enabled: false
+        /// )
+        /// ```
+        public var changePassword: BooleanCapability?
+
+        /// Capability to indicate if the user can change their display name.
+        ///
+        /// This capability has a single flag, enabled, to denote whether the user is able to change their own display
+        /// name via profile endpoints. Cases for disabling might include users mapped from external identity/directory
+        /// services, such as LDAP.
+        ///
+        /// Note that this is well paired with the
+        /// ``MatrixClient/MatrixCapabilities/Capabilities-swift.struct/setAvatarUrl`` capability.
+        ///
+        /// # Example
+        /// ```swift
+        /// let setDisplayNameCapability = BooleanCapability(
+        ///     enabled: false
+        /// )
+        /// ```
+        public var setDisplayName: BooleanCapability?
+
+        /// Capability to indicate if the user can change their avatar.
+        ///
+        /// This capability has a single flag, enabled, to denote whether the user is able to change their own avatar via profile
+        /// endpoints. Cases for disabling might include users mapped from external identity/directory services, such as LDAP.
+        ///
+        /// Note that this is well paired with the
+        /// ``MatrixClient/MatrixCapabilities/Capabilities-swift.struct/setDisplayName`` capability.
+        ///
+        /// # Example
+        /// ```swift
+        /// let setAvatarUrlCapability = BooleanCapability(
+        ///     enabled: false
+        /// )
+        /// ```
+        public var setAvatarUrl: BooleanCapability?
+
+        // TODO: Change `Admin Contact Information` to link to struct implementing it.
+        /// Capability to indicate if the user can change the 3PID informations.
+        ///
+        /// This capability has a single flag, enabled, to denote whether the user is able to add, remove, or change
+        /// 3PID associations on their account. Note that this only affects a user’s ability to use the
+        /// `Admin Contact Information` API, not endpoints exposed by an Identity Service.
+        /// Cases for disabling might include users mapped from external identity/directory services, such as LDAP.
+        public var change3Pid: BooleanCapability?
 
         /// The room versions the server supports.
         public var roomVersions: RoomVersionsCapability?
@@ -56,20 +110,7 @@ public extension MatrixCapabilities {
 }
 
 public extension MatrixCapabilities.Capabilities {
-    /// Capability to indicate if the user can change their password.
-    ///
-    /// This capability has a single flag, enabled, which indicates whether or not the user can use
-    /// the /account/password API to change their password. If not present, the client should
-    /// assume that password changes are possible via the API. When present, clients SHOULD
-    /// respect the capability’s enabled flag and indicate to the user if they are unable to change their password.
-    ///
-    /// # Example
-    /// ```swift
-    /// let changePasswordCapability = ChangePasswordCapability(
-    ///     enabled: false
-    /// )
-    /// ```
-    struct ChangePasswordCapability: Codable {
+    struct BooleanCapability: Codable {
         public init(enabled: Bool = true) {
             self.enabled = enabled
         }
@@ -139,7 +180,7 @@ public extension MatrixCapabilities.Capabilities {
     }
 }
 
-extension MatrixCapabilities.Capabilities.ChangePasswordCapability: ExpressibleByBooleanLiteral, RawRepresentable {
+extension MatrixCapabilities.Capabilities.BooleanCapability: ExpressibleByBooleanLiteral, RawRepresentable {
     public init(booleanLiteral value: BooleanLiteralType) {
         enabled = value
     }
@@ -184,6 +225,8 @@ extension MatrixCapabilities.Capabilities.RoomVersionsCapability.RoomVersionStab
 
 public extension MatrixCapabilities.Capabilities {
     /// Capability to indicate if the user can change their password.
+    ///
+    /// Accessor for ``changePassword``.
     var canChangePassword: Bool {
         get {
             changePassword?.enabled ?? true
@@ -195,6 +238,44 @@ public extension MatrixCapabilities.Capabilities {
                 return
             }
             changePassword = .init(enabled: newValue)
+        }
+    }
+
+
+    /// Capability to indicate if the user can change their display name.
+    ///
+    /// Accessor for ``setDisplayName``.
+    var canSetDisplayName: Bool {
+        get {
+            setDisplayName?.enabled ?? true
+        }
+        set {
+            setDisplayName = .init(enabled: newValue)
+        }
+    }
+
+    /// Capability to indicate if the user can change their avatar.
+    ///
+    /// Accessor for ``setAvatarUrl``.
+    var canSetAvatarUrl: Bool {
+        get {
+            setAvatarUrl?.enabled ?? true
+        }
+        set {
+            setAvatarUrl = .init(enabled: true)
+        }
+    }
+
+
+    /// Capability to indicate if the user can change the 3PID informations.
+    ///
+    /// Accessor for ``change3Pid``.
+    var canChange3Pid: Bool {
+        get {
+            change3Pid?.enabled ?? true
+        }
+        set {
+            change3Pid = .init(enabled: true)
         }
     }
 
@@ -231,6 +312,9 @@ extension MatrixCapabilities.Capabilities {
     enum KnownCodingKeys: String, CodingKey, CaseIterable {
         case changePassword = "m.change_password"
         case roomVersions = "m.room_versions"
+        case setDisplayName = "m.set_displayname"
+        case setAvatarUrl = "m.set_avatar_url"
+        case change3Pid = "m.3pid_changes"
 
         static func doesNotContain(_ key: DynamicCodingKeys) -> Bool {
             !Self.allCases.map(\.stringValue).contains(key.stringValue)
@@ -252,7 +336,7 @@ extension MatrixCapabilities.Capabilities {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: KnownCodingKeys.self)
-        changePassword = try container.decodeIfPresent(ChangePasswordCapability.self, forKey: .changePassword)
+        changePassword = try container.decodeIfPresent(BooleanCapability.self, forKey: .changePassword)
         roomVersions = try container.decodeIfPresent(RoomVersionsCapability.self, forKey: .roomVersions)
 
         extraInfo = [:]
@@ -279,7 +363,7 @@ extension MatrixCapabilities.Capabilities {
     }
 }
 
-public extension MatrixCapabilities.Capabilities.ChangePasswordCapability {
+public extension MatrixCapabilities.Capabilities.BooleanCapability {
     internal enum CodingKeys: String, CodingKey {
         case enabled
     }
