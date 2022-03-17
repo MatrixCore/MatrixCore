@@ -1,5 +1,9 @@
 # ``MatrixClient``
 
+@Metadata {
+    @TechnologyRoot
+}
+
 Matrix Client with Swift 5.5 async API.
 
 ## Overview
