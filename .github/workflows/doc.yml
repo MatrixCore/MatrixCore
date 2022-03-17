@@ -1,0 +1,11 @@
+name: DocC
+on: [push]
+env: 
+  DEVELOPER_DIR: /Applications/Xcode_13.3.app/Contents/Developer
+jobs:
+  build:
+    runs-on: macos-12
+    steps:
+      - uses: 'actions/checkout@v2'
+      - name: Build
+        run: swift package --allow-writing-to-directory doc generate-documentation --target MatrixClient --disable-indexing --output-path doc --transform-for-static-hosting
