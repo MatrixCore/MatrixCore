@@ -69,7 +69,7 @@ extension MatrixRegisterRequest: MatrixRequest {
     /// The kind of account to register. Defaults to user.
     public typealias URLParameters = MatrixRegisterRequest.RegisterKind
 
-    func parse(data: Data, response: HTTPURLResponse) throws -> Response {
+    public func parse(data: Data, response: HTTPURLResponse) throws -> Response {
         guard response.statusCode != 401 else {
             return try MatrixRegisterContainer.interactive(.init(fromMatrixRequestData: data))
         }
@@ -118,6 +118,33 @@ public struct MatrixRegister: MatrixResponse {
 public enum MatrixRegisterContainer: MatrixResponse {
     case success(MatrixRegister)
     case interactive(MatrixInteractiveAuth)
+
+    public var isSuccess: Bool {
+        switch self {
+        case .success:
+            return true
+        case .interactive:
+            return false
+        }
+    }
+
+    public var successData: MatrixRegister? {
+        switch self {
+        case let .success(register):
+            return register
+        case .interactive:
+            return nil
+        }
+    }
+
+    public var interactiveData: MatrixInteractiveAuth? {
+        switch self {
+        case .success:
+            return nil
+        case let .interactive(interactive):
+            return interactive
+        }
+    }
 }
 
 public struct MatrixRegisterRequestEmailTokenRequest: MatrixRequest {

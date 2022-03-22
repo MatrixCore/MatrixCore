@@ -50,6 +50,22 @@ public extension MatrixClient {
 
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    func canRegister() async throws -> Bool {
+        do {
+            _ = try await getRegisterFlows()
+        } catch let error as MatrixServerError {
+            if error.errcode == .Forbidden {
+                return false
+            }
+            throw error
+        } catch {
+            throw error
+        }
+        return true
+    }
+
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func register(
         password: String,
         username: String? = nil,

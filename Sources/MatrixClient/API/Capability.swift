@@ -241,7 +241,6 @@ public extension MatrixCapabilities.Capabilities {
         }
     }
 
-
     /// Capability to indicate if the user can change their display name.
     ///
     /// Accessor for ``setDisplayName``.
@@ -265,7 +264,6 @@ public extension MatrixCapabilities.Capabilities {
             setAvatarUrl = .init(enabled: true)
         }
     }
-
 
     /// Capability to indicate if the user can change the 3PID informations.
     ///

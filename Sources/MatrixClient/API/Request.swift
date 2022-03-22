@@ -35,6 +35,8 @@ public protocol MatrixRequest: Codable {
     /// `True` if the request requires authentication.
     static var requiresAuth: Bool { get }
 
+    func parse(data: Data, response: HTTPURLResponse) throws -> Response
+
     // TODO: rate limited property?
 }
 
