@@ -120,11 +120,11 @@ public extension MatrixInteractiveAuth {
 public struct MatrixInteractiveAuthResponse: Codable {
     public var session: String?
 
-    public var type: MatrixLoginFlow
+    public var type: MatrixLoginFlow?
 
     public var extraInfo: [String: AnyCodable]
 
-    public init(session: String? = nil, type: MatrixLoginFlow, extraInfo: [String: AnyCodable] = [:]) {
+    public init(session: String? = nil, type: MatrixLoginFlow?, extraInfo: [String: AnyCodable] = [:]) {
         self.session = session
         self.type = type
         self.extraInfo = extraInfo
@@ -191,7 +191,7 @@ public extension MatrixInteractiveAuthResponse {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: KnownCodingKeys.self)
         try container.encodeIfPresent(session, forKey: .session)
-        try container.encode(type.rawValue, forKey: .type)
+        try container.encodeIfPresent(type?.rawValue, forKey: .type)
 
         var extraContainer = encoder.container(keyedBy: DynamicCodingKeys.self)
         for (name, value) in extraInfo {
