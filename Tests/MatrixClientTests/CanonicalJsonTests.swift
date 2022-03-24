@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Finn Behrens on 24.03.22.
 //
@@ -11,22 +11,17 @@ import XCTest
 
 /// Test Canonical json as described in https://spec.matrix.org/v1.2/appendices/#canonical-json
 final class CanonicalJsonTests: XCTestCase {
-
     func testEmptyJson() throws {
-
         let value = Value()
 
         let json = try MatrixClient.encode(value)
 
         XCTAssertEqual(json, Data("{}".utf8))
 
-        struct Value: Encodable {
-
-        }
+        struct Value: Encodable {}
     }
 
     func testOrderingJson() throws {
-
         let value = Value(two: "Two", one: 1)
 
         let json = try MatrixClient.encode(value)
@@ -40,7 +35,6 @@ final class CanonicalJsonTests: XCTestCase {
     }
 
     func testUnicode() throws {
-
         let json = try MatrixClient.encode(Value(a: "日本語"))
 
         XCTAssertEqual(json, Data("{\"a\":\"日本語\"}".utf8))

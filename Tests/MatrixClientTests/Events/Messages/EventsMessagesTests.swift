@@ -227,8 +227,7 @@ final class EventsMessagesTests: XCTestCase {
         let origText = MatrixMessageText(body: "foo", format: "org.matrix.custom.html", formattedBody: "bar")
         let orig = MatrixMessageContainer(content: origText)
 
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(orig)
+        let data = try MatrixClient.encode(orig)
 
         let new = try MatrixMessageContainer(fromJSON: data)
 

@@ -210,6 +210,7 @@ public extension MatrixClient {
     static func encode<T>(_ value: T) throws -> Data where T: Encodable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
+        encoder.userInfo[.matrixMessageTypes] = MatrixClient.messageTypes
         return try encoder.encode(value)
     }
 }

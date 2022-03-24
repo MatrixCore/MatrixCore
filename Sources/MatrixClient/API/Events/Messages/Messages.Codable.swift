@@ -57,16 +57,16 @@ public struct MatrixCodableMessageType: Codable {
 
     public func encode(to encoder: Encoder) throws {
         try wrappedValue.encode(to: encoder)
-        // try wrappedValue.encode(to: encoder)
 
-        /* guard let types = encoder.userInfo[.matrixMessageTypes] as? [MatrixMessageType.Type] else {
-             throw MessageTypeError.missingTypes
-         }
+        let type = type(of: wrappedValue)
 
-         let matchingType = types.first(
+        var container = encoder.container(keyedBy: MatrixMessageTypeCodingKeys.self)
+        try container.encode(type.type, forKey: .type)
+
+        /* let matchingType = types.first(
              let new = wrappedValue as? $0.self;
              true
-         })
+             })
          if let matchingType = types.first(where: { testType in (wrappedValue as? testType.Type) != nil }) {
 
          } */
