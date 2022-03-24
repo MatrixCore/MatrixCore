@@ -83,7 +83,7 @@ extension MatrixRegisterRequest: MatrixRequest {
 }
 
 public struct MatrixRegister: MatrixResponse {
-    public init(accessToken: String, homeServer: String, refreshToken: String? = nil, userID: String) {
+    public init(accessToken: String, homeServer: String, refreshToken: String? = nil, userID: MatrixUserIdentifier) {
         self.accessToken = accessToken
         self.homeServer = homeServer
         self.refreshToken = refreshToken
@@ -104,7 +104,7 @@ public struct MatrixRegister: MatrixResponse {
     public var refreshToken: String?
 
     /// The fully-qualified Matrix ID that has been registered.
-    public var userID: String
+    public var userID: MatrixUserIdentifier
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"

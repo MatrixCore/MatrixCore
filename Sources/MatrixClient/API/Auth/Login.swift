@@ -309,7 +309,7 @@ extension MatrixLoginRequest: MatrixRequest {
 
 public struct MatrixLogin: MatrixResponse {
     public init(
-        userId: String? = nil,
+        userId: MatrixUserIdentifier? = nil,
         accessToken: String? = nil,
         homeServer: String? = nil,
         deviceId: String? = nil,
@@ -323,7 +323,7 @@ public struct MatrixLogin: MatrixResponse {
     }
 
     /// The fully-qualified Matrix ID that has been registered.
-    public var userId: String?
+    public var userId: MatrixUserIdentifier?
 
     /// An access token for the account. This access token can then be used to authorise other requests.
     public var accessToken: String?
@@ -332,7 +332,8 @@ public struct MatrixLogin: MatrixResponse {
     @available(
         *,
         deprecated,
-        message: "Clients should extract the server_name from userId (by splitting at the first colon) if they require it."
+        message: "Clients should extract the server_name from userId (by splitting at the first colon) if they require it.",
+        renamed: "userID.domain"
     )
     public var homeServer: String?
 

@@ -35,7 +35,7 @@ let package = Package(
         
         .target(
             name: "MatrixCore",
-            dependencies: []),
+            dependencies: ["MatrixClient"]),
         .testTarget(
             name: "MatrixCoreTests",
             dependencies: ["MatrixCore"]),

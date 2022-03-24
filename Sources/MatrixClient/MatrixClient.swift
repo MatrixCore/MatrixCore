@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os.log
 
 public struct MatrixClient {
     public var homeserver: MatrixHomeserver
@@ -25,6 +26,9 @@ public struct MatrixClient {
         MatrixReactionEvent.self,
         MatrixRedactionEvent.self,
     ]
+
+    @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+    internal static var logger = Logger()
 
     /// Initializes a Matrix client object with the specified parameters.
     /// - Parameters:
@@ -145,5 +149,14 @@ public struct MatrixClient {
                 withUrlSession: urlSession,
                 callback: callback
             )
+    }
+
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    public func isReady() async throws {
+        let versions = try await getVersions()
+        if !versions.versions.contains("v1.2") {
+            throw MatrixError.NotFound
+        }
     }
 }

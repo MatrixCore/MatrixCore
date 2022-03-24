@@ -205,3 +205,11 @@ public extension MatrixResponse {
         self = try decoder.decode(Self.self, from: data)
     }
 }
+
+public extension MatrixClient {
+    static func encode<T>(_ value: T) throws -> Data where T: Encodable {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        return try encoder.encode(value)
+    }
+}
