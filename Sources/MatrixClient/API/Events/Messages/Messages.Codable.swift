@@ -24,10 +24,6 @@ extension CodingUserInfoKey {
     }
 }
 
-/* extension [String: AnyCodable]: MatrixMessageType {
-     static public var type: String = ""
- } */
-
 @propertyWrapper
 public struct MatrixCodableMessageType: Codable {
     public var wrappedValue: MatrixMessageType
@@ -62,17 +58,6 @@ public struct MatrixCodableMessageType: Codable {
 
         var container = encoder.container(keyedBy: MatrixMessageTypeCodingKeys.self)
         try container.encode(type.type, forKey: .type)
-
-        /* let matchingType = types.first(
-             let new = wrappedValue as? $0.self;
-             true
-             })
-         if let matchingType = types.first(where: { testType in (wrappedValue as? testType.Type) != nil }) {
-
-         } */
-
-        /* var container = encoder.container(keyedBy: MatrixMessageTypeCodingKeys.self)
-         try container.encode(wrappedValue, forKey: .type) */
     }
 
     public enum MessageTypeError: Error {
