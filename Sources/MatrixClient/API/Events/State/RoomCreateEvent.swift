@@ -34,15 +34,13 @@ import Foundation
 /// }
 /// ```
 public struct MatrixRoomCreateEvent: MatrixEvent {
-    public static var type = "m.room.create"
+    public static let type = "m.room.create"
 
     public var content: Content
 
-    public var type: String
-
-    public var eventID: String
-    public var sender: String
-    public var date: Date
+    public var eventID: String?
+    public var sender: String?
+    public var date: Date?
     public var unsigned: AnyCodable?
 }
 
