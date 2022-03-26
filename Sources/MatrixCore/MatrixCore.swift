@@ -19,6 +19,35 @@ public actor MatrixCore {
         )
     }
 
+    public init?(homeserver: MatrixHomeserver, loginResponse login: MatrixLogin) {
+        guard let userID = login.userId else {
+            return nil
+        }
+
+        let newHomeserver: MatrixHomeserver
+        if let baseURL = login.wellKnown?.homeserver?.baseURL {
+            newHomeserver = MatrixHomeserver(string: baseURL)!
+        } else {
+            newHomeserver = homeserver
+        }
+
+        self.userID = userID
+        client = MatrixClient(
+            homeserver: newHomeserver,
+            urlSession: URLSession(configuration: .default),
+            accessToken: login.accessToken
+        )
+    }
+
+    public init(homeserver: MatrixHomeserver, userID: MatrixUserIdentifier, accessToken: String) {
+        client = MatrixClient(
+            homeserver: homeserver,
+            urlSession: URLSession(configuration: .default),
+            accessToken: accessToken
+        )
+        self.userID = userID
+    }
+
     // MARK: - computed variables
 
     public var accessToken: String? {

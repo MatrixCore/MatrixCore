@@ -7,7 +7,7 @@ let package = Package(
     name: "MatrixCore",
     platforms: [
         .iOS(.v12), .tvOS(.v12),
-        .watchOS(.v5), .macOS(.v10_13)
+        .watchOS(.v5), .macOS(.v10_15)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -22,6 +22,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.0"),
+        //.package(url: "https://gitlab.matrix.org/matrix-org/olm", from: "3.2.10"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -35,7 +36,9 @@ let package = Package(
         
         .target(
             name: "MatrixCore",
-            dependencies: ["MatrixClient"]),
+            dependencies: [
+                "MatrixClient",
+            ]),
         .testTarget(
             name: "MatrixCoreTests",
             dependencies: ["MatrixCore"]),
