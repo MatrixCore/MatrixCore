@@ -38,6 +38,7 @@ let package = Package(
             name: "MatrixCore",
             dependencies: [
                 "MatrixClient",
+                "AnyCodable"
             ]),
         .testTarget(
             name: "MatrixCoreTests",

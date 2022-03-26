@@ -7,6 +7,7 @@
 
 import CoreData
 import Foundation
+import MatrixClient
 import OSLog
 
 public protocol MatrixStoreManager {
@@ -23,9 +24,7 @@ public class MatrixStore: MatrixStoreManager {
 
     let logger = Logger(subsystem: "dev.matrixcore", category: "matrixstore")
 
-    // MARK: Core Data
-
-    static let shared = MatrixStore()
+    public static let shared = MatrixStore()
 
     static let preview = MatrixStore(inMemory: true)
 
@@ -47,6 +46,45 @@ public class MatrixStore: MatrixStoreManager {
         }
     }
 
+    // MARK: MatrixAccount
+
+    public func addMatrixAccount(homeserver: MatrixHomeserver, userID: String) async throws {
+        let taskContext = newTaskContext()
+        taskContext.name = "addMatrixAccountContext"
+        taskContext.transactionAuthor = "addMatrixAccountContext"
+
+        let account = MatrixAccount(context: taskContext)
+
+        account.homeserver = homeserver.url.url
+        account.userID = userID
+
+        try await taskContext.perform {
+            taskContext.insert(account)
+            try taskContext.save()
+        }
+        print("inserted")
+    }
+
+    public func saveMatrixAccount(account: MatrixCore) async throws {
+        guard let userID = await account.userID.FQMXID else {
+            throw MatrixCoreError.missingData
+        }
+
+        try await addMatrixAccount(homeserver: await account.client.homeserver, userID: userID)
+    }
+
+    public func getMatrixAccount() async throws -> [(URL?, MatrixUserIdentifier?)] {
+        let taskContext = newTaskContext()
+        taskContext.name = "getMatrixAccountContext"
+        taskContext.transactionAuthor = "getMatrixAccountContext"
+
+        return try await taskContext.perform {
+            try taskContext.fetch(MatrixAccount.fetchRequest()).map { ($0.homeserver, $0.mxUserId) }
+        }
+    }
+
+    // MARK: Core Data
+
     deinit {
         if let observer = notificationToken {
             NotificationCenter.default.removeObserver(observer)
@@ -58,8 +96,8 @@ public class MatrixStore: MatrixStoreManager {
 
     /// A persistent container to set up the Core Data stack.
     lazy var container: NSPersistentContainer = {
-        guard let url = Bundle.module.url(forResource: "MatrixCore", withExtension: "mom")
-        else { fatalError("Could not get URL for model: MarixCore") }
+        guard let url = Bundle.module.url(forResource: "MatrixCore", withExtension: "momd")
+        else { fatalError("Could not get URL for model: MatrixCore") }
 
         guard let model = NSManagedObjectModel(contentsOf: url) else { fatalError("Could not get model for: \(url)") }
 
