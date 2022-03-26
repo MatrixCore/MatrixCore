@@ -7,10 +7,9 @@ import Foundation
 public protocol MatrixEvent: Codable {
     static var type: String { get }
 
-    // var content: Content { get }
-    var eventID: String { get }
-    var sender: String { get }
-    var date: Date { get }
+    var eventID: String? { get }
+    var sender: String? { get }
+    var date: Date? { get }
     var unsigned: AnyCodable? { get }
 }
 
@@ -35,7 +34,7 @@ extension KeyedDecodingContainer {
 extension CodingUserInfoKey {
     /// The key used to determine the types of `MatrixEvent` that can be decoded.
     static var matrixEventTypes: CodingUserInfoKey {
-        CodingUserInfoKey(rawValue: "MatrixCore.EventTypes")!
+        CodingUserInfoKey(rawValue: "MatrixClient.EventTypes")!
     }
 }
 
@@ -76,8 +75,18 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
             wrappedEvent = decoded
         }
 
-        func encode(to _: Encoder) throws {
-            fatalError("Event encoding not implemented.")
+        func encode(to encoder: Encoder) throws {
+            guard let wrappedEvent = wrappedEvent as? Codable,
+                  let contentType = type(of: wrappedEvent) as? MatrixEvent.Type
+            else {
+                assertionFailure("wrappedEvent is not Codable")
+                return
+            }
+
+            try wrappedEvent.encode(to: encoder)
+
+            var container = encoder.container(keyedBy: MatrixEventTypeKeys.self)
+            try container.encode(contentType.type, forKey: .type)
         }
     }
 
@@ -95,7 +104,12 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
         wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
     }
 
-    public func encode(to _: Encoder) throws {
-        fatalError("Event encoding not implemented.")
+    public func encode(to encoder: Encoder) throws {
+        guard let wrappedValue = wrappedValue as? Codable else {
+            assertionFailure("wrappedEvent is not Codable")
+            return
+        }
+
+        try wrappedValue.encode(to: encoder)
     }
 }

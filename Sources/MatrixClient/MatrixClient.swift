@@ -25,6 +25,18 @@ public struct MatrixClient {
         MatrixNameEvent.self,
         MatrixReactionEvent.self,
         MatrixRedactionEvent.self,
+        MatrixRoomCreateEvent.self,
+    ]
+
+    public static var messageTypes: [MatrixMessageType.Type] = [
+        MatrixMessageText.self,
+        MatrixMessageEmote.self,
+        MatrixMessageNotice.self,
+        MatrixMessageImage.self,
+        MatrixMessageFile.self,
+        MatrixMessageAudio.self,
+        MatrixMessageLocation.self,
+        MatrixMessageVideo.self,
     ]
 
     @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)

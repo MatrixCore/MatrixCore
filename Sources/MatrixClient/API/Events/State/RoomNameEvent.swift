@@ -2,20 +2,18 @@ import AnyCodable
 import Foundation
 
 public struct MatrixNameEvent: MatrixEvent {
-    public static var type = "m.room.name"
+    public static let type = "m.room.name"
 
-    public let content: Content
-    public let type: String
-    public let eventID: String
-    public let sender: String
-    public let date: Date
-    public let unsigned: AnyCodable?
+    public var content: Content
+    public var eventID: String?
+    public var sender: String?
+    public var date: Date?
+    public var unsigned: AnyCodable?
 
     public let stateKey: String?
 
     enum CodingKeys: String, CodingKey {
         case content
-        case type
         case eventID = "event_id"
         case sender
         case date = "origin_server_ts"

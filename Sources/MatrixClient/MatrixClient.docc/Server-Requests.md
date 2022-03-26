@@ -38,6 +38,9 @@ Protocols ``MatrixClient/MatrixRequest`` and ``MatrixClient/MatrixResponse``
 - ``MatrixClient/MatrixRegisterRequestEmailTokenRequest``
 - ``MatrixClient/MatrixRegisterRequestEmailToken``
 
+### Room
+
+
 ### Requests
 - ``MatrixClient/MatrixLoginRequest``
 - ``MatrixClient/MatrixFilterRequest``
