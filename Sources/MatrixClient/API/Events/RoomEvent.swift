@@ -76,11 +76,8 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
         }
 
         func encode(to encoder: Encoder) throws {
-            guard let wrappedEvent = wrappedEvent as? Codable,
-                  let contentType = type(of: wrappedEvent) as? MatrixEvent.Type
-            else {
-                return
-            }
+            let wrappedEvent = wrappedEvent as! Codable
+            let contentType = type(of: wrappedEvent) as! MatrixEvent.Type
 
             try wrappedEvent.encode(to: encoder)
 
@@ -95,7 +92,7 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
         self.wrappedValue = wrappedValue
     }
 
-    public init(from decoder: Decoder) {
+    public init(from decoder: Decoder) throws {
         guard let container = try? decoder.singleValueContainer(),
               let wrappers = try? container.decode([EventWrapper<Value.Element>].self)
         else { return }
@@ -104,9 +101,7 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
     }
 
     public func encode(to encoder: Encoder) throws {
-        guard let wrappedValue = wrappedValue as? Codable else {
-            return
-        }
+        let wrappedValue = wrappedValue as! Codable
 
         try wrappedValue.encode(to: encoder)
     }
