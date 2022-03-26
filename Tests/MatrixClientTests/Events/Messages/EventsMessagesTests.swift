@@ -105,8 +105,8 @@ final class EventsMessagesTests: XCTestCase {
 
         XCTAssertEqual(decoded.body, "filename.jpg")
         XCTAssertEqual(decoded.url, "mxc://example.org/JWEIFJgwEIhweiWJE")
-        XCTAssertEqual(decoded.info?.h, 398)
-        XCTAssertEqual(decoded.info?.w, 394)
+        XCTAssertEqual(decoded.info?.height, 398)
+        XCTAssertEqual(decoded.info?.width, 394)
         XCTAssertEqual(decoded.info?.mimetype, "image/jpeg")
         XCTAssertEqual(decoded.info?.size, 31037)
     }
@@ -170,9 +170,9 @@ final class EventsMessagesTests: XCTestCase {
 
         XCTAssertEqual(decoded.body, "Big Ben, London, UK")
         XCTAssertEqual(decoded.geoURI, "geo:51.5008,0.1247")
-        XCTAssertEqual(decoded.info?.thumbnailUrl, "mxc://example.org/FHyPlCeYUSFFxlgbQYZmoEoe")
-        XCTAssertEqual(decoded.info?.thumbnailInfo?.h, 300)
-        XCTAssertEqual(decoded.info?.thumbnailInfo?.w, 300)
+        XCTAssertEqual(decoded.info?.thumbnailURL, "mxc://example.org/FHyPlCeYUSFFxlgbQYZmoEoe")
+        XCTAssertEqual(decoded.info?.thumbnailInfo?.height, 300)
+        XCTAssertEqual(decoded.info?.thumbnailInfo?.width, 300)
         XCTAssertEqual(decoded.info?.thumbnailInfo?.size, 46144)
         XCTAssertEqual(decoded.info?.thumbnailInfo?.mimetype, "image/jpeg")
     }
@@ -212,13 +212,13 @@ final class EventsMessagesTests: XCTestCase {
         XCTAssertEqual(decoded.body, "Gangnam Style")
         XCTAssertEqual(decoded.url, "mxc://example.org/a526eYUSFFxlgbQYZmo442")
         XCTAssertEqual(decoded.info?.duration, 2_140_786)
-        XCTAssertEqual(decoded.info?.h, 320)
-        XCTAssertEqual(decoded.info?.w, 480)
+        XCTAssertEqual(decoded.info?.height, 320)
+        XCTAssertEqual(decoded.info?.width, 480)
         XCTAssertEqual(decoded.info?.size, 1_563_685)
         XCTAssertEqual(decoded.info?.mimetype, "video/mp4")
         XCTAssertEqual(decoded.info?.thumbnailUrl, "mxc://example.org/FHyPlCeYUSFFxlgbQYZmoEoe")
-        XCTAssertEqual(decoded.info?.thumbnailInfo?.h, 300)
-        XCTAssertEqual(decoded.info?.thumbnailInfo?.w, 300)
+        XCTAssertEqual(decoded.info?.thumbnailInfo?.height, 300)
+        XCTAssertEqual(decoded.info?.thumbnailInfo?.width, 300)
         XCTAssertEqual(decoded.info?.thumbnailInfo?.size, 46144)
         XCTAssertEqual(decoded.info?.thumbnailInfo?.mimetype, "image/jpeg")
     }

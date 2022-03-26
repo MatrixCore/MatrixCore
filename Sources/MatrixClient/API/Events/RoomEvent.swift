@@ -7,7 +7,6 @@ import Foundation
 public protocol MatrixEvent: Codable {
     static var type: String { get }
 
-    // var content: Content { get }
     var eventID: String? { get }
     var sender: String? { get }
     var date: Date? { get }

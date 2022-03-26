@@ -78,14 +78,14 @@ public extension MatrixRoomCreateEvent {
 public extension MatrixRoomCreateEvent.Content {
     struct PreviousRoom: Codable {
         /// The event ID of the last known event in the old room.
-        public var eventId: String
+        public var eventID: String
 
         /// The ID of the old room.
-        public var roomId: String
+        public var roomID: String
 
         enum CodingKeys: String, CodingKey {
-            case eventId = "event_id"
-            case roomId = "room_id"
+            case eventID = "event_id"
+            case roomID = "room_id"
         }
     }
 }

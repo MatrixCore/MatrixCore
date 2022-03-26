@@ -25,7 +25,7 @@ public struct MatrixMessageRelatesTo: Codable {
 
 /// This message is the most basic message and is used to represent text.
 public struct MatrixMessageText: MatrixMessageType {
-    public static var type = "m.text"
+    public static let type = "m.text"
 
     /// The body of the message.
     public var body: String
@@ -54,7 +54,7 @@ public struct MatrixMessageText: MatrixMessageType {
 /// This message could also be represented in a different colour to
 /// distinguish it from regular ``MatrixClient/MatrixMessageText`` messages.
 public struct MatrixMessageEmote: MatrixMessageType {
-    public static var type = "m.emote"
+    public static let type = "m.emote"
 
     /// The emote action to perform.
     public var body: String
@@ -86,7 +86,7 @@ public struct MatrixMessageEmote: MatrixMessageType {
 /// messages must never be automatically responded to.
 /// This helps to prevent infinite-loop situations where two automated clients continuously exchange messages.
 public struct MatrixMessageNotice: MatrixMessageType {
-    public static var type: String = "m.notice"
+    public static let type: String = "m.notice"
 
     /// The body of the message.
     public var body: String
@@ -109,7 +109,7 @@ public struct MatrixMessageNotice: MatrixMessageType {
 }
 
 public struct MatrixMessageImage: MatrixMessageType {
-    public static var type: String = "m.image"
+    public static let type: String = "m.image"
 
     /// A textual representation of the image.
     ///
@@ -145,12 +145,12 @@ public struct MatrixMessageImage: MatrixMessageType {
         /// The intended display height of the image in pixels.
         ///
         /// This may differ from the intrinsic dimensions of the image file.
-        public var h: Int?
+        public var height: Int?
 
         /// The intended display width of the image in pixels.
         ///
         /// This may differ from the intrinsic dimensions of the image file.
-        public var w: Int?
+        public var width: Int?
 
         // TODO: UTType?
         /// The mimetype of the image, e.g. image/jpeg.
@@ -172,13 +172,15 @@ public struct MatrixMessageImage: MatrixMessageType {
         /// The URL (typically MXC URI) to a thumbnail of the image.
         ///
         /// Only present if the thumbnail is unencrypted.
-        public var thumbnailUrl: String?
+        public var thumbnailURL: String?
 
         enum CodingKeys: String, CodingKey {
-            case h, w, mimetype, size
+            case height = "h"
+            case width = "w"
+            case mimetype, size
             // case thumbnailFile = "thumbnail_file"
             case thumbnailInfo = "thumbnail_info"
-            case thumbnailUrl = "thumbnail_url"
+            case thumbnailURL = "thumbnail_url"
         }
     }
 }
@@ -188,12 +190,12 @@ public extension MatrixMessageImage.ImageInfo {
         /// The intended display height of the image in pixels.
         ///
         /// This may differ from the intrinsic dimensions of the image file.
-        public var h: Int?
+        public var height: Int?
 
         /// The intended display width of the image in pixels.
         ///
         /// This may differ from the intrinsic dimensions of the image file.
-        public var w: Int?
+        public var width: Int?
 
         // TODO: UTType?
         /// The mimetype of the image, e.g. image/jpeg.
@@ -201,12 +203,18 @@ public extension MatrixMessageImage.ImageInfo {
 
         /// Size of the image in bytes.
         public var size: Int?
+
+        enum CodingKeys: String, CodingKey {
+            case height = "h"
+            case width = "w"
+            case mimetype, size
+        }
     }
 }
 
 /// This message represents a generic file.
 public struct MatrixMessageFile: MatrixMessageType {
-    public static var type: String = "m.file"
+    public static let type: String = "m.file"
 
     /// A human-readable description of the file.
     ///
@@ -260,20 +268,20 @@ public struct MatrixMessageFile: MatrixMessageType {
         /// The URL (typically MXC URI) to a thumbnail of the image.
         ///
         /// Only present if the thumbnail is unencrypted.
-        public var thumbnailUrl: String?
+        public var thumbnailURL: String?
 
         enum CodingKeys: String, CodingKey {
             case mimetype, size
             // case thumbnailFile = "thumbnail_file"
             case thumbnailInfo = "thumbnail_info"
-            case thumbnailUrl = "thumbnail_url"
+            case thumbnailURL = "thumbnail_url"
         }
     }
 }
 
 /// This message represents a single audio clip.
 public struct MatrixMessageAudio: MatrixMessageType {
-    public static var type: String = "m.audio"
+    public static let type: String = "m.audio"
 
     ///  description of the audio e.g. ‘Bee Gees - Stayin’ Alive', or some kind of content description
     ///  for accessibility e.g. ‘audio attachment’.
@@ -316,7 +324,7 @@ public struct MatrixMessageAudio: MatrixMessageType {
 
 /// This message represents a real-world location.
 public struct MatrixMessageLocation: MatrixMessageType {
-    public static var type: String = "m.location"
+    public static let type: String = "m.location"
 
     /// A description of the location e.g. ‘Big Ben, London, UK’, or some kind of content
     /// description for accessibility e.g. ‘location attachment’.
@@ -351,19 +359,19 @@ public struct MatrixMessageLocation: MatrixMessageType {
         /// The URL (typically MXC URI) to a thumbnail of the image.
         ///
         /// Only present if the thumbnail is unencrypted.
-        public var thumbnailUrl: String?
+        public var thumbnailURL: String?
 
         enum CodingKeys: String, CodingKey {
             // case thumbnailFile = "thumbnail_file"
             case thumbnailInfo = "thumbnail_info"
-            case thumbnailUrl = "thumbnail_url"
+            case thumbnailURL = "thumbnail_url"
         }
     }
 }
 
 /// This message represents a single video clip.
 public struct MatrixMessageVideo: MatrixMessageType {
-    public static var type: String = "m.video"
+    public static let type: String = "m.video"
 
     /// A description of the video e.g. ‘Gangnam style’, or some kind of
     /// content description for accessibility e.g. ‘video attachment’.
@@ -396,10 +404,10 @@ public struct MatrixMessageVideo: MatrixMessageType {
         public var duration: Int?
 
         /// The height of the video in pixels.
-        public var h: Int?
+        public var height: Int?
 
         /// The width of the video in pixels.
-        public var w: Int?
+        public var width: Int?
 
         // TODO: UTType?
         /// The mimetype of the video, e.g. video/mp4.
@@ -424,7 +432,10 @@ public struct MatrixMessageVideo: MatrixMessageType {
         public var thumbnailUrl: String?
 
         enum CodingKeys: String, CodingKey {
-            case duration, h, w, mimetype, size
+            case duration
+            case height = "h"
+            case width = "w"
+            case mimetype, size
             // case thumbnailFile = "thumbnail_file"
             case thumbnailInfo = "thumbnail_info"
             case thumbnailUrl = "thumbnail_url"

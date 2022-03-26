@@ -5,7 +5,6 @@ public struct MatrixReactionEvent: MatrixEvent {
     public static let type = "m.reaction"
 
     public var content: Content
-    public var type: String?
     public var eventID: String?
     public var sender: String?
     public var date: Date?
@@ -13,7 +12,6 @@ public struct MatrixReactionEvent: MatrixEvent {
 
     enum CodingKeys: String, CodingKey {
         case content
-        case type
         case eventID = "event_id"
         case sender
         case date = "origin_server_ts"

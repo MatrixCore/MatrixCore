@@ -29,7 +29,7 @@ public struct MatrixCreateRoomRequest: Codable {
     public var invite: [String]?
 
     /// A list of objects representing third party IDs to invite into the room.
-    public var invite3Pid: [Invite3pid]?
+    public var invite3PID: [Invite3PID]?
 
     /// This flag makes the server set the is_direct flag on the m.room.member
     /// events sent to the users in invite and invite_3pid.
@@ -87,7 +87,7 @@ public struct MatrixCreateRoomRequest: Codable {
         case creationContent = "creation_content"
         case initialState = "initial_state"
         case invite
-        case invite3Pid = "invite_3pid"
+        case invite3PID = "invite_3pid"
         case isDirect = "is_direct"
         case name
         // case powerLevelContentOverride = "power_level_content_override"
@@ -105,21 +105,28 @@ public extension MatrixCreateRoomRequest {
         case trustedPrivateChat = "trusted_private_chat"
     }
 
-    struct Invite3pid: Codable {
+    struct Invite3PID: Codable {
         /// The invitee’s third party identifier.
         public var address: String
 
         /// An access token previously registered with the identity server.
         /// Servers can treat this as optional to distinguish between r0.5-compatible
         /// clients and this specification version.
-        public var idAccessToken: String
+        public var identityAccessToken: String
 
         /// The hostname+port of the identity server which should be used for third party
         /// identifier lookups.
-        public var idServer: String
+        public var identityServer: String
 
         /// The kind of address being passed in the address field, for example email.
         public var medium: String
+
+        enum CodingKeys: String, CodingKey {
+            case address
+            case identityAccessToken = "id_access_token"
+            case identityServer = "id_server"
+            case medium
+        }
     }
 
     struct StateEvent: Codable {
@@ -170,9 +177,9 @@ extension MatrixCreateRoomRequest: MatrixRequest {
 
 public struct MatrixCreateRoom: MatrixResponse {
     /// The created room’s ID.
-    public var roomId: String
+    public var roomID: String
 
     enum CodingKeys: String, CodingKey {
-        case roomId = "room_id"
+        case roomID = "room_id"
     }
 }
