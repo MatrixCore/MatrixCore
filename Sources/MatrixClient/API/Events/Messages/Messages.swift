@@ -15,7 +15,7 @@ public struct MatrixMessageRelatesTo: Codable {
     }
 
     public struct InReplyTo: Codable {
-        public var eventID: String
+        public var eventID: String?
 
         enum CodingKeys: String, CodingKey {
             case eventID = "event_id"
