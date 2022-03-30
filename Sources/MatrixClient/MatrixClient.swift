@@ -42,6 +42,10 @@ public struct MatrixClient {
     @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
     internal static var logger = Logger()
 
+    public var homeserverURL: URL? {
+        homeserver.url.url
+    }
+
     /// Initializes a Matrix client object with the specified parameters.
     /// - Parameters:
     ///   - homeserver: The homeserver the client should contact.

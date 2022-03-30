@@ -14,6 +14,7 @@ public enum MatrixCoreError: Error {
     case batchDeleteError
     case persistentHistoryChangeError
     case unexpectedError(error: Error)
+    case keychainError(OSStatus)
 }
 
 extension MatrixCoreError: LocalizedError {
@@ -34,6 +35,8 @@ extension MatrixCoreError: LocalizedError {
             return NSLocalizedString("Failed to execute a persistent history change request.", comment: "")
         case let .unexpectedError(error):
             return NSLocalizedString("Received unexpected error. \(error.localizedDescription)", comment: "")
+        case let .keychainError(error):
+            return NSLocalizedString("Keychain did not succedd. \(error)", comment: "")
         }
     }
 }

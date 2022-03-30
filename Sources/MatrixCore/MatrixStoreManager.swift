@@ -26,7 +26,7 @@ public class MatrixStore: MatrixStoreManager {
 
     public static let shared = MatrixStore()
 
-    static let preview = MatrixStore(inMemory: true)
+    public static let preview = MatrixStore(inMemory: true)
 
     private let inMemory: Bool
     private var notificationToken: NSObjectProtocol?
@@ -48,40 +48,47 @@ public class MatrixStore: MatrixStoreManager {
 
     // MARK: MatrixAccount
 
-    public func addMatrixAccount(homeserver: MatrixHomeserver, userID: String) async throws {
-        let taskContext = newTaskContext()
-        taskContext.name = "addMatrixAccountContext"
-        taskContext.transactionAuthor = "addMatrixAccountContext"
+    /* public func addMatrixAccount(homeserver: MatrixHomeserver, userID: String) async throws {
+         let taskContext = newTaskContext()
+         taskContext.name = "addMatrixAccountContext"
+         taskContext.transactionAuthor = "addMatrixAccountContext"
 
-        let account = MatrixAccount(context: taskContext)
+         let account = MatrixAccount(context: taskContext)
 
-        account.homeserver = homeserver.url.url
-        account.userID = userID
+         account.homeserver = homeserver.url.url
+         account.userID = userID
 
-        try await taskContext.perform {
-            taskContext.insert(account)
-            try taskContext.save()
-        }
-        print("inserted")
-    }
+         try await taskContext.perform {
+             taskContext.insert(account)
+             try taskContext.save()
+         }
+         print("inserted")
+     }
 
-    public func saveMatrixAccount(account: MatrixCore) async throws {
-        guard let userID = await account.userID.FQMXID else {
-            throw MatrixCoreError.missingData
-        }
+     public func saveMatrixAccount(account: MatrixCore, extraKeychainArguments: [String: Any] = [:]) async throws {
 
-        try await addMatrixAccount(homeserver: await account.client.homeserver, userID: userID)
-    }
+         try await account.saveToKeychain(extraKeychainArguments: extraKeychainArguments)
+         try await account.saveToCoreData()
+     }
 
-    public func getMatrixAccount() async throws -> [(URL?, MatrixUserIdentifier?)] {
-        let taskContext = newTaskContext()
-        taskContext.name = "getMatrixAccountContext"
-        taskContext.transactionAuthor = "getMatrixAccountContext"
+     public func getMatrixAccount() async throws -> [(URL?, MatrixUserIdentifier?)] {
+         let taskContext = newTaskContext()
+         taskContext.name = "getMatrixAccountContext"
+         taskContext.transactionAuthor = "getMatrixAccountContext"
 
-        return try await taskContext.perform {
-            try taskContext.fetch(MatrixAccount.fetchRequest()).map { ($0.homeserver, $0.mxUserId) }
-        }
-    }
+         return try await taskContext.perform {
+             try taskContext.fetch(MatrixAccount.fetchRequest()).map { ($0.homeserver, $0.mxUserId) }
+         }
+     }
+
+     public func loadMatrixAccounts(extraKeychainArguments: [String: Any] = [:]) async throws -> [MatrixCore] {
+         var ret: [MatrixCore] = []
+         for (homeserver, userID) in try await self.getMatrixAccount() {
+             let homeserver = homeserver.flatMap { MatrixHomeserver(url: $0) }
+             ret.append(try await MatrixCore(userID: userID!, extraKeychainArguments: extraKeychainArguments, homeserver: homeserver))
+         }
+         return ret
+     } */
 
     // MARK: Core Data
 
@@ -140,7 +147,7 @@ public class MatrixStore: MatrixStoreManager {
     }()
 
     /// Creates and configures a private queue context.
-    private func newTaskContext() -> NSManagedObjectContext {
+    internal func newTaskContext() -> NSManagedObjectContext {
         // Create a private queue context.
         /// - Tag: newBackgroundContext
         let taskContext = container.newBackgroundContext()

@@ -2,9 +2,14 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E230" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="MatrixCore">
     <entity name="MatrixAccount" representedClassName="MatrixCore.MatrixAccount" syncable="YES" codeGenerationType="class">
         <attribute name="homeserver" optional="YES" attributeType="URI"/>
-        <attribute name="userID" attributeType="String" allowsCloudEncryption="YES"/>
+        <attribute name="userID" attributeType="String" allowsCloudEncryption="YES" customClassName="MatrixUserIdentifier"/>
         <relationship name="matrixRooms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MatrixRoom" inverseName="owningAccount" inverseEntity="MatrixRoom"/>
         <relationship name="matrixUsers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MatrixUser" inverseName="owningAccount" inverseEntity="MatrixUser"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="userID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
     </entity>
     <entity name="MatrixRoom" representedClassName=".MatrixRoom" syncable="YES" codeGenerationType="class">
         <attribute name="roomID" attributeType="String"/>
