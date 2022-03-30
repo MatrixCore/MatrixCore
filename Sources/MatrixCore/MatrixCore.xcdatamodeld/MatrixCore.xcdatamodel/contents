@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E230" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="MatrixCore">
     <entity name="MatrixAccount" representedClassName="MatrixCore.MatrixAccount" syncable="YES" codeGenerationType="class">
+        <attribute name="displayName" optional="YES" attributeType="String"/>
         <attribute name="homeserver" optional="YES" attributeType="URI"/>
         <attribute name="userID" attributeType="String" allowsCloudEncryption="YES" customClassName="MatrixUserIdentifier"/>
-        <relationship name="matrixRooms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MatrixRoom" inverseName="owningAccount" inverseEntity="MatrixRoom"/>
-        <relationship name="matrixUsers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="MatrixUser" inverseName="owningAccount" inverseEntity="MatrixUser"/>
+        <relationship name="matrixRooms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MatrixRoom" inverseName="owningAccount" inverseEntity="MatrixRoom"/>
+        <relationship name="matrixUsers" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="MatrixUser" inverseName="owningAccount" inverseEntity="MatrixUser"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="userID"/>
@@ -14,7 +15,7 @@
     <entity name="MatrixRoom" representedClassName=".MatrixRoom" syncable="YES" codeGenerationType="class">
         <attribute name="roomID" attributeType="String"/>
         <relationship name="directWithUser" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MatrixUser" inverseName="directRoom" inverseEntity="MatrixUser"/>
-        <relationship name="owningAccount" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MatrixAccount" inverseName="matrixRooms" inverseEntity="MatrixAccount"/>
+        <relationship name="owningAccount" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="MatrixAccount" inverseName="matrixRooms" inverseEntity="MatrixAccount"/>
     </entity>
     <entity name="MatrixUser" representedClassName=".MatrixUser" syncable="YES" codeGenerationType="class">
         <attribute name="displayName" optional="YES" attributeType="String" allowsCloudEncryption="YES"/>
@@ -23,7 +24,7 @@
         <relationship name="owningAccount" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MatrixAccount" inverseName="matrixUsers" inverseEntity="MatrixAccount"/>
     </entity>
     <elements>
-        <element name="MatrixAccount" positionX="153" positionY="81" width="128" height="89"/>
+        <element name="MatrixAccount" positionX="153" positionY="81" width="128" height="104"/>
         <element name="MatrixRoom" positionX="255.97265625" positionY="-3.58984375" width="128" height="74"/>
         <element name="MatrixUser" positionX="-45" positionY="0" width="128" height="89"/>
     </elements>

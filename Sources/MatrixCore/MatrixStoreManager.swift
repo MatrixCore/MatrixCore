@@ -202,6 +202,17 @@ public class MatrixStore: MatrixStoreManager {
             }
         }
     }
+
+    public func deleteAll() async throws {
+        let deleteAccountDataRequest = NSBatchDeleteRequest(fetchRequest: MatrixAccount.fetchRequest())
+        deleteAccountDataRequest.resultType = .resultTypeCount
+
+        try await viewContext.perform {
+            let result = try self.viewContext.execute(deleteAccountDataRequest)
+            try self.viewContext.save()
+            print(result)
+        }
+    }
 }
 
 /*

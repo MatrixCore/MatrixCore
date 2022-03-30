@@ -19,6 +19,12 @@ public actor MatrixCore {
     /// Default keychain arguments, used when calling saveToKeychain or init with save = true (the default).
     public static var extraKeychainArguments: [String: Any] = [:]
 
+    // MARK: - Dynamic variables
+
+    public var displayName: String? {
+        coreDataMatrixAccount.displayName
+    }
+
     // MARK: - Init
 
     /// Create a MatrixCore from login response.
@@ -215,6 +221,46 @@ public actor MatrixCore {
         }
 
         return token
+    }
+
+    // MARK: - logout
+
+    public func logout() async throws {
+        try await client.logout()
+        try await context.perform {
+            self.context.delete(self.coreDataMatrixAccount)
+            try self.context.save()
+        }
+
+        do {
+            try deleteKeychain()
+        } catch let MatrixCoreError.keychainError(osStatus) {
+            MatrixCore.logger.error("Failed to delete Keychain item: \(osStatus)")
+        } catch {
+            throw error
+        }
+    }
+
+    public func deleteKeychain() throws {
+        try MatrixCore.deleteKeychain(
+            userID: userID.FQMXID!,
+            domain: userID.domain!,
+            extraKeychainArguments: MatrixCore.extraKeychainArguments
+        )
+    }
+
+    internal static func deleteKeychain(userID: String, domain: String,
+                                        extraKeychainArguments: [String: Any]) throws
+    {
+        var keychainQuery = extraKeychainArguments
+        keychainQuery[kSecClass as String] = kSecClassInternetPassword
+        keychainQuery[kSecAttrAccount as String] = userID
+        keychainQuery[kSecAttrServer as String] = domain
+
+        let status = SecItemDelete(keychainQuery as CFDictionary)
+        guard status == errSecSuccess else {
+            throw MatrixCoreError.keychainError(status)
+        }
     }
 }
 
