@@ -139,6 +139,7 @@ public class MatrixStore: MatrixStoreManager {
         container.viewContext.name = "viewContext"
         /// - Tag: viewContextMergePolicy
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        // TODO: needed for profile settings?
         container.viewContext.undoManager = nil
         container.viewContext.shouldDeleteInaccessibleFaults = true
 
@@ -225,10 +226,7 @@ public class MatrixStore: MatrixStoreManager {
 
     #if DEBUG
         public static func createPreviewData(context: NSManagedObjectContext) throws {
-            let amir = MatrixAccount(context: context)
-            amir.displayName = "Amir Sanders"
-            amir.userID = "@amir_sanders:example.com"
-            amir.homeserver = URL(string: "https://example.com")!
+            _ = MatrixStore.createAmir(context: context)
 
             let hendricks = MatrixAccount(context: context)
             hendricks.displayName = "Sara Hendricks"
@@ -236,6 +234,15 @@ public class MatrixStore: MatrixStoreManager {
             hendricks.homeserver = URL(string: "https://example.com")!
 
             try context.save()
+        }
+
+        public static func createAmir(context: NSManagedObjectContext) -> MatrixAccount {
+            let amir = MatrixAccount(context: context)
+            amir.displayName = "Amir Sanders"
+            amir.userID = "@amir_sanders:example.com"
+            amir.homeserver = URL(string: "https://example.com")!
+
+            return amir
         }
     #endif
 }
