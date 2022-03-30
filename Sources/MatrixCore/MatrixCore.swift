@@ -10,7 +10,8 @@ import OSLog
 public class MatrixCore {
     public let context: NSManagedObjectContext
 
-    internal let coreDataMatrixAccount: MatrixAccount
+    // TODO: internal?
+    public var coreDataMatrixAccount: MatrixAccount
 
     public internal(set) var client: MatrixClient
     public internal(set) var userID: MatrixUserIdentifier
