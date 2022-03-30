@@ -26,7 +26,6 @@ public class MatrixStore: MatrixStoreManager {
 
     public static let shared = MatrixStore()
 
-
     private let inMemory: Bool
     private var notificationToken: NSObjectProtocol?
 
@@ -143,9 +142,10 @@ public class MatrixStore: MatrixStoreManager {
         container.viewContext.undoManager = nil
         container.viewContext.shouldDeleteInaccessibleFaults = true
 
-
         #if DEBUG
-        try! MatrixStore.createPreviewData(context: container.viewContext)
+            if inMemory {
+                try! MatrixStore.createPreviewData(context: container.viewContext)
+            }
         #endif
 
         return container
@@ -219,25 +219,24 @@ public class MatrixStore: MatrixStoreManager {
         }
     }
 
-
     // MARK: - preview helpers
+
     public static let preview = MatrixStore(inMemory: true)
 
     #if DEBUG
-    public static func createPreviewData(context: NSManagedObjectContext) throws {
-        let amir = MatrixAccount(context: context)
-        amir.displayName = "Amir Sanders"
-        amir.userID = "@amir_sanders:example.com"
-        amir.homeserver = URL(string: "https://example.com")!
+        public static func createPreviewData(context: NSManagedObjectContext) throws {
+            let amir = MatrixAccount(context: context)
+            amir.displayName = "Amir Sanders"
+            amir.userID = "@amir_sanders:example.com"
+            amir.homeserver = URL(string: "https://example.com")!
 
-        let hendricks = MatrixAccount(context: context)
-        hendricks.displayName = "Sara Hendricks"
-        hendricks.userID = "@sara_hendricks:example.com"
-        hendricks.homeserver = URL(string: "https://example.com")!
+            let hendricks = MatrixAccount(context: context)
+            hendricks.displayName = "Sara Hendricks"
+            hendricks.userID = "@sara_hendricks:example.com"
+            hendricks.homeserver = URL(string: "https://example.com")!
 
-
-        try context.save()
-    }
+            try context.save()
+        }
     #endif
 }
 
