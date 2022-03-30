@@ -6,7 +6,8 @@ import OSLog
 
 @available(swift, introduced: 5.5)
 @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
-public actor MatrixCore {
+@MainActor
+public class MatrixCore {
     public let context: NSManagedObjectContext
 
     internal let coreDataMatrixAccount: MatrixAccount
@@ -15,9 +16,6 @@ public actor MatrixCore {
     public internal(set) var userID: MatrixUserIdentifier
 
     internal static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "MatrixCore")
-
-    /// Default keychain arguments, used when calling saveToKeychain or init with save = true (the default).
-    public static var extraKeychainArguments: [String: Any] = [:]
 
     // MARK: - Dynamic variables
 
@@ -135,7 +133,7 @@ public actor MatrixCore {
         let accessToken = try MatrixCore.loadFromKeychain(
             userID: userID.FQMXID!,
             domain: userID.domain!,
-            extraKeychainArguments: MatrixCore.extraKeychainArguments
+            extraKeychainArguments: MatrixCoreSettings.extraKeychainArguments
         )
 
         client = MatrixClient(
@@ -180,7 +178,9 @@ public actor MatrixCore {
     }
 
     /// Save accessToken to keychain.
-    public func saveToKeychain(extraKeychainArguments: [String: Any] = MatrixCore.extraKeychainArguments) throws {
+    public func saveToKeychain(extraKeychainArguments: [String: Any] = MatrixCoreSettings
+        .extraKeychainArguments) throws
+    {
         let userID = self.userID.FQMXID!
 
         var keychainInsertquery = extraKeychainArguments
@@ -245,7 +245,7 @@ public actor MatrixCore {
         try MatrixCore.deleteKeychain(
             userID: userID.FQMXID!,
             domain: userID.domain!,
-            extraKeychainArguments: MatrixCore.extraKeychainArguments
+            extraKeychainArguments: MatrixCoreSettings.extraKeychainArguments
         )
     }
 
@@ -260,6 +260,16 @@ public actor MatrixCore {
         let status = SecItemDelete(keychainQuery as CFDictionary)
         guard status == errSecSuccess else {
             throw MatrixCoreError.keychainError(status)
+        }
+    }
+
+    // MARK: - ??
+
+    public func updateDisplayName() async throws {
+        let displayname = try await client.getDisplayName(userID)
+        coreDataMatrixAccount.displayName = displayname
+        try await context.perform {
+            try self.context.save()
         }
     }
 }
