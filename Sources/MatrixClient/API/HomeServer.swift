@@ -15,6 +15,13 @@ public struct MatrixHomeserver: Codable {
         self.url = url
     }
 
+    public init?(url: URL) {
+        guard let url = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            return nil
+        }
+        self.url = url
+    }
+
     public init?(string: String) {
         guard
             let components = URLComponents(string: string),
