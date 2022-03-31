@@ -43,12 +43,23 @@ public struct MatrixDeviceRequest: MatrixRequest {
 
 /// A list of all registered devices for this user.
 public struct MatrixDevices: MatrixResponse {
+    public init(devices: [MatrixDevice]) {
+        self.devices = devices
+    }
+
     /// A list of all registered devices for this user.
     public var devices: [MatrixDevice]
 }
 
 /// A registered device for this user.
 public struct MatrixDevice: MatrixResponse {
+    public init(deviceID: String, displayName: String? = nil, lastSeenIP: String? = nil, lastSeen: Date? = nil) {
+        self.deviceID = deviceID
+        self.displayName = displayName
+        self.lastSeenIP = lastSeenIP
+        self.lastSeen = lastSeen
+    }
+
     /// Identifier of this device.
     public var deviceID: String
 
@@ -59,13 +70,19 @@ public struct MatrixDevice: MatrixResponse {
     public var lastSeenIP: String?
 
     /// The time this device was last seen.
-    public var lastSeen: Date
+    public var lastSeen: Date?
 
     enum CodingKeys: String, CodingKey {
         case deviceID = "device_id"
         case displayName = "display_name"
         case lastSeenIP = "last_seen_ip"
         case lastSeen = "last_seen_ts"
+    }
+}
+
+extension MatrixDevice: Identifiable {
+    public var id: String {
+        deviceID
     }
 }
 

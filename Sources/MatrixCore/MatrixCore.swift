@@ -35,7 +35,8 @@ public class MatrixCore {
     ) async throws {
         guard let userID = login.userId,
               let FQMXID = userID.FQMXID,
-              let accessToken = login.accessToken
+              let accessToken = login.accessToken,
+              let deviceID = login.deviceId
         else {
             throw MatrixCoreError.missingData
         }
@@ -63,7 +64,13 @@ public class MatrixCore {
             )
         }
 
-        try await self.init(client: client, userID: userID, accessToken: accessToken, context: context)
+        try await self.init(
+            client: client,
+            userID: userID,
+            accessToken: accessToken,
+            context: context,
+            deviceID: deviceID
+        )
     }
 
     /// Create a MatrixCore from register response.
@@ -73,7 +80,8 @@ public class MatrixCore {
         matrixStore: MatrixStore = MatrixStore.shared,
         save _: Bool = true
     ) async throws {
-        guard let FQMXID = register.userID.FQMXID
+        guard let FQMXID = register.userID.FQMXID,
+              let deviceID = register.deviceID
         else {
             throw MatrixCoreError.missingData
         }
@@ -93,7 +101,8 @@ public class MatrixCore {
             userID: register.userID,
             accessToken: register.accessToken,
             context: context,
-            save: true
+            save: true,
+            deviceID: deviceID
         )
     }
 
@@ -102,7 +111,8 @@ public class MatrixCore {
         userID: MatrixUserIdentifier,
         accessToken _: String,
         context: NSManagedObjectContext,
-        save: Bool = true
+        save: Bool = true,
+        deviceID: String
     ) async throws {
         self.context = context
 
@@ -112,6 +122,7 @@ public class MatrixCore {
         coreDataMatrixAccount = MatrixAccount(context: self.context)
         coreDataMatrixAccount.homeserver = client.homeserverURL
         coreDataMatrixAccount.userID = userID.FQMXID!
+        coreDataMatrixAccount.deviceID = deviceID
 
         if save {
             try saveToKeychain()

@@ -97,6 +97,12 @@ public struct MatrixRegister: MatrixResponse {
     /// they should attempt to refresh for a new token on failure, and retry the request with the new token.
     public var accessToken: String
 
+    /// ID of the registered device.
+    ///
+    /// Will be the same as the corresponding parameter in the request, if one was specified.
+    /// Required if the inhibit_login option is false.
+    public var deviceID: String?
+
     /// The hostname of the homeserver on which the account has been registered.
     public var homeServer: String
 
@@ -108,6 +114,7 @@ public struct MatrixRegister: MatrixResponse {
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
+        case deviceID = "device_id"
         case homeServer = "home_server"
         case refreshToken = "refresh_token"
         case userID = "user_id"
