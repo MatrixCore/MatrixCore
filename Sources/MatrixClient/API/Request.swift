@@ -13,9 +13,10 @@ public enum HttpMethod: String, CaseIterable {
     case POST
     case PUT
     case PATCH
+    case DELETE
 
     /// Methods which contain a body to parse.
-    public static var containsBody: [Self] = [.POST, .PUT, .PATCH]
+    public static var containsBody: [Self] = [.POST, .PUT, .PATCH, .DELETE]
 }
 
 /// A type that can be requested on a Matrix server.
@@ -214,3 +215,5 @@ public extension MatrixClient {
         return try encoder.encode(value)
     }
 }
+
+public struct MatrixEmptyResponse: MatrixResponse {}
