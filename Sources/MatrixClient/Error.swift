@@ -39,6 +39,7 @@ public enum MatrixError: String, Error, Codable {
     case TermsNotSigned = "M_TERMS_NOT_SIGNED"
     case InvalidPepper = "M_INVALID_PEPPER"
     case Exclusive = "M_EXCLUSIVE"
+    case InvalidParam = "M_INVALID_PARAM"
 }
 
 public struct MatrixServerError: Error, Codable {

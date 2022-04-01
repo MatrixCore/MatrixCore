@@ -29,7 +29,7 @@ public struct MatrixSetDisplayName: MatrixRequest, MatrixResponse {
     public var displayname: String
 
     public func components(for homeserver: MatrixHomeserver, with userID: String) throws -> URLComponents {
-        homeserver.path("/_matrix/client/v3/profiles/\(userID)/displayname")
+        homeserver.path("/_matrix/client/v3/profile/\(userID)/displayname")
     }
 
     public static var httpMethod: HttpMethod {

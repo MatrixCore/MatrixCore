@@ -238,7 +238,15 @@ public class MatrixCore {
     // MARK: - logout
 
     public func logout() async throws {
-        try await client.logout()
+        do {
+            try await client.logout()
+        } catch let error as MatrixServerError {
+            if error.errcode == .UnknownToken {
+                MatrixCore.logger.info("Token already Unknown. possibly already logged out?")
+            } else {
+                throw error
+            }
+        }
         try await context.perform {
             self.context.delete(self.coreDataMatrixAccount)
             try self.context.save()

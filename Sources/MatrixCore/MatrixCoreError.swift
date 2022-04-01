@@ -8,6 +8,7 @@
 import Foundation
 
 public enum MatrixCoreError: Error {
+    case actorMissing
     case missingData
     case creationError
     case batchInsertError
@@ -20,6 +21,8 @@ public enum MatrixCoreError: Error {
 extension MatrixCoreError: LocalizedError {
     public var errorDescription: String? {
         switch self {
+        case .actorMissing:
+            return NSLocalizedString("Did not found MatrixCore instance to use for request", comment: "")
         case .missingData:
             return NSLocalizedString(
                 "Found and will discard a quake missing a valid code, magnitude, place, or time.",
