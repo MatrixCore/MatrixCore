@@ -55,7 +55,7 @@ import Foundation
 /// The length restriction is derived from the limit on the length of the `sender` key on events; since the user ID
 /// appears in every event sent by the user, it is limited to ensure that the user ID does not dominate over the actual
 /// content of the events.
-public struct MatrixUserIdentifier: RawRepresentable {
+public struct MatrixUserIdentifier: RawRepresentable, Equatable {
     public var localpart: String
     public var domain: String?
 
