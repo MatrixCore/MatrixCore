@@ -7,6 +7,12 @@
 
 import Foundation
 
+public protocol MatrixUserIdentifierProtocol: Equatable, Comparable {
+    var localpart: String { get set }
+
+    init?(string: String)
+}
+
 /// Users within Matrix are uniquely identified by their Matrix user ID.
 ///
 /// The user ID is namespaced to the homeserver which allocated the account and has the form:
@@ -55,7 +61,11 @@ import Foundation
 /// The length restriction is derived from the limit on the length of the `sender` key on events; since the user ID
 /// appears in every event sent by the user, it is limited to ensure that the user ID does not dominate over the actual
 /// content of the events.
-public struct MatrixUserIdentifier: RawRepresentable, Equatable {
+public struct MatrixUserIdentifier: RawRepresentable, MatrixUserIdentifierProtocol {
+    public static func < (lhs: MatrixUserIdentifier, rhs: MatrixUserIdentifier) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+
     public var localpart: String
     public var domain: String?
 
@@ -149,6 +159,68 @@ extension MatrixUserIdentifier: Codable {
         let container = try decoder.singleValueContainer()
         let rawValue = try container.decode(String.self)
         let id = MatrixUserIdentifier(string: rawValue)
+        if let id = id {
+            self = id
+        } else {
+            throw MatrixError.BadJSON
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
+public struct MatrixFullUserIdentifier: RawRepresentable, MatrixUserIdentifierProtocol {
+    public init(localpart: String, domain: String) {
+        self.localpart = localpart
+        self.domain = domain
+    }
+
+    public var localpart: String
+    public var domain: String
+
+    public init?(rawValue: MatrixUserIdentifier) {
+        guard let domain = rawValue.domain else {
+            return nil
+        }
+        self.domain = domain
+        localpart = rawValue.localpart
+    }
+
+    public init?(string: String) {
+        guard let rawValue = MatrixUserIdentifier(string: string)
+        else {
+            return nil
+        }
+        guard let domain = rawValue.domain else {
+            return nil
+        }
+        self.domain = domain
+        localpart = rawValue.localpart
+    }
+
+    public var rawValue: MatrixUserIdentifier {
+        .init(locapart: localpart, domain: domain)
+    }
+
+    public var FQMXID: String {
+        "@\(localpart):\(domain)"
+    }
+
+    public typealias RawValue = MatrixUserIdentifier
+
+    public static func < (lhs: MatrixFullUserIdentifier, rhs: MatrixFullUserIdentifier) -> Bool {
+        lhs.FQMXID < rhs.FQMXID
+    }
+}
+
+extension MatrixFullUserIdentifier: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        let id = MatrixFullUserIdentifier(string: rawValue)
         if let id = id {
             self = id
         } else {

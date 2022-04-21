@@ -1,26 +1,84 @@
 
-import CoreData
 import Foundation
 import MatrixClient
 import OSLog
+
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+internal struct MatrixCoreLogger {
+    internal static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "MatrixCore")
+}
+
+@available(swift, introduced: 5.5)
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+@MainActor
+public class MatrixCore<T: MatrixStore> {
+    public let store: T
+    public var info: T.AccountInfo
+
+    public var client: MatrixClient
+
+    // MARK: - computed variables
+
+    public var id: T.AccountInfo.AccountIdentifier {
+        info.id
+    }
+
+    public var accessToken: String? {
+        get {
+            info.accessToken
+        }
+        set {
+            info.accessToken = newValue
+            client.accessToken = newValue
+        }
+    }
+
+    public var mxID: MatrixFullUserIdentifier {
+        info.mxID
+    }
+
+    public var FQMXID: String {
+        info.FQMXID
+    }
+
+    public convenience init(store: T, accountID: T.AccountInfo.AccountIdentifier) async throws {
+        let info = try await store.getAccountInfo(accountID: accountID)
+        self.init(store: store, account: info)
+    }
+
+    public init(store: T, account: T.AccountInfo) {
+        self.store = store
+        info = account
+        client = MatrixClient(
+            homeserver: account.homeServer,
+            urlSession: URLSession(configuration: .default),
+            accessToken: account.accessToken
+        )
+    }
+
+    // MARK: auth management
+
+    /// Issue loggout request to Homeserver and remove account info from store.
+    public func logout() async throws {
+        do {
+            try await client.logout()
+        } catch let error as MatrixServerError {
+            if error.errcode == .UnknownToken {
+                MatrixCoreLogger.logger.warning("Token already unknown at homeserver. deleting account info.")
+            } else {
+                throw error
+            }
+        }
+
+        try await store.deleteAccountInfo(account: info)
+    }
+}
 
 /*
  @available(swift, introduced: 5.5)
  @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
  @MainActor
  public class MatrixCore {
-     public let context: NSManagedObjectContext
-
-     // TODO: internal?
-     public var coreDataMatrixAccount: MatrixAccount
-
-     public internal(set) var client: MatrixClient
-     public internal(set) var userID: MatrixUserIdentifier
-
-     internal static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "MatrixCore")
-
-     // MARK: - Dynamic variables
-
      public var displayName: String? {
          coreDataMatrixAccount.displayName
      }
