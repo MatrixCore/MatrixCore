@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol MatrixUserIdentifierProtocol: Equatable, Comparable {
+public protocol MatrixUserIdentifierProtocol: Equatable, Comparable, Hashable {
     var localpart: String { get set }
 
     init?(string: String)
@@ -172,7 +172,7 @@ extension MatrixUserIdentifier: Codable {
     }
 }
 
-public struct MatrixFullUserIdentifier: RawRepresentable, MatrixUserIdentifierProtocol {
+public struct MatrixFullUserIdentifier: RawRepresentable, MatrixUserIdentifierProtocol, Identifiable {
     public init(localpart: String, domain: String) {
         self.localpart = localpart
         self.domain = domain
@@ -207,6 +207,10 @@ public struct MatrixFullUserIdentifier: RawRepresentable, MatrixUserIdentifierPr
 
     public var FQMXID: String {
         "@\(localpart):\(domain)"
+    }
+
+    public var id: String {
+        FQMXID
     }
 
     public typealias RawValue = MatrixUserIdentifier
