@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol MatrixUserIdentifierProtocol: Equatable, Comparable, Hashable {
+public protocol MatrixUserIdentifierProtocol: Equatable, Comparable, Hashable, CustomStringConvertible {
     var localpart: String { get set }
 
     init?(string: String)
@@ -148,6 +148,10 @@ public struct MatrixUserIdentifier: RawRepresentable, MatrixUserIdentifierProtoc
         return nil
     }
 
+    public var description: String {
+        rawValue
+    }
+
     // MARK: static variables
 
     static let allowedLocalCharacters = CharacterSet(charactersIn: "1234567890abcdefghijklmnopqrstuvwxyz-.=_/")
@@ -207,6 +211,10 @@ public struct MatrixFullUserIdentifier: RawRepresentable, MatrixUserIdentifierPr
 
     public var FQMXID: String {
         "@\(localpart):\(domain)"
+    }
+
+    public var description: String {
+        FQMXID
     }
 
     public var id: String {

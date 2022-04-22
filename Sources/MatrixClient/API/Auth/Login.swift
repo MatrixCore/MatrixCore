@@ -309,7 +309,7 @@ extension MatrixLoginRequest: MatrixRequest {
 
 public struct MatrixLogin: MatrixResponse {
     public init(
-        userId: MatrixUserIdentifier? = nil,
+        userId: MatrixFullUserIdentifier? = nil,
         accessToken: String? = nil,
         homeServer: String? = nil,
         deviceId: String? = nil,
@@ -323,7 +323,7 @@ public struct MatrixLogin: MatrixResponse {
     }
 
     /// The fully-qualified Matrix ID that has been registered.
-    public var userId: MatrixUserIdentifier?
+    public var userId: MatrixFullUserIdentifier?
 
     /// An access token for the account. This access token can then be used to authorise other requests.
     public var accessToken: String?
