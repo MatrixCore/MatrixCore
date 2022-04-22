@@ -25,6 +25,12 @@ public extension MatrixClient {
 
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    func setDeviceDisplayName(_ displayName: String, device: MatrixDevice) async throws {
+        try await setDeviceDisplayName(displayName, deviceID: device.deviceID)
+    }
+
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func setDeviceDisplayName(_ displayName: String, deviceID: String) async throws {
         _ = try await MatrixSetDeviceDisplayName(displayName: displayName)
             .response(on: homeserver, withToken: accessToken, with: deviceID, withUrlSession: urlSession)
