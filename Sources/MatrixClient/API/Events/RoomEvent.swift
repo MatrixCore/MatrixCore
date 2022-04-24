@@ -32,7 +32,7 @@ extension KeyedDecodingContainer {
     }
 }
 
-extension CodingUserInfoKey {
+public extension CodingUserInfoKey {
     /// The key used to determine the types of `MatrixEvent` that can be decoded.
     static var matrixEventTypes: CodingUserInfoKey {
         CodingUserInfoKey(rawValue: "MatrixClient.EventTypes")!

@@ -18,7 +18,7 @@ enum MatrixMessageTypeCodingKeys: String, CodingKey {
     case type = "msgtype"
 }
 
-extension CodingUserInfoKey {
+public extension CodingUserInfoKey {
     static var matrixMessageTypes: CodingUserInfoKey {
         CodingUserInfoKey(rawValue: "MatrixClient.MessageTypes")!
     }

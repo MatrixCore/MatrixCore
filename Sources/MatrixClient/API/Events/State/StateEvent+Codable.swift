@@ -16,7 +16,7 @@ enum MatrixStateEventTypeCodingKeys: String, CodingKey {
     case content
 }
 
-extension CodingUserInfoKey {
+public extension CodingUserInfoKey {
     static var matrixStateEventTypes: CodingUserInfoKey {
         CodingUserInfoKey(rawValue: "MatrixClient.StateTypes")!
     }
