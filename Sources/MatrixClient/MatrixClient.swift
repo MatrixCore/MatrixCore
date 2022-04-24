@@ -145,6 +145,14 @@ public struct MatrixClient {
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession, callback: callback)
     }
 
+
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    public func whoami() async throws -> MatrixWhoAmI {
+        return try await MatrixWhoAmIRequest()
+            .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
+    }
+
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func sync(parameters: MatrixSyncRequest.Parameters) async throws -> MatrixSync {
@@ -172,7 +180,7 @@ public struct MatrixClient {
     public func isReady() async throws {
         let versions = try await getVersions()
         if !versions.versions.contains("v1.2") {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
     }
 }

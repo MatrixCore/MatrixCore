@@ -44,7 +44,7 @@ public extension MatrixClient {
         case let .interactive(flows):
             return flows
         default:
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
     }
 

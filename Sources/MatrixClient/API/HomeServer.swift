@@ -37,7 +37,7 @@ public struct MatrixHomeserver: Codable {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public init(resolve string: String, withUrlSession urlSession: URLSession = URLSession.shared) async throws {
         guard let self = MatrixHomeserver(string: string) else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
 
         var res: MatrixWellKnown

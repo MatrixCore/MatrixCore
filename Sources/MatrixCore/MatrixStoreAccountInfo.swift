@@ -54,7 +54,7 @@ public extension MatrixStoreAccountInfo {
     func saveToKeychain(extraKeychainArguments: [String: Any] = [:]) throws {
         guard let accessToken = self.accessToken?.data(using: .utf8)
         else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
 
         var keychainInsertQuery = extraKeychainArguments

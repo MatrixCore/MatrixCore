@@ -12,7 +12,7 @@ public extension MatrixClient {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getDisplayName(_ userID: MatrixUserIdentifier) async throws -> String {
         guard let userID = userID.FQMXID else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
         return try await getDisplayName(userID: userID)
     }
@@ -29,7 +29,7 @@ public extension MatrixClient {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func setDisplayName(_ displayName: String, _ userID: MatrixUserIdentifier) async throws {
         guard let userID = userID.FQMXID else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
 
         try await setDisplayName(displayName, userID: userID)

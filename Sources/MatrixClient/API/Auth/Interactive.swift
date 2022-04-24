@@ -15,7 +15,7 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         session: String? = nil,
         completed: [MatrixLoginFlow]? = nil,
         error: String? = nil,
-        errcode: MatrixError? = nil
+        errcode: MatrixErrorCode? = nil
     ) {
         self.flows = flows
         self.params = params
@@ -39,7 +39,7 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     public var completed: [MatrixLoginFlow]?
 
     public var error: String?
-    public var errcode: MatrixError?
+    public var errcode: MatrixErrorCode?
 
     // MARK: Dynamic vars
 

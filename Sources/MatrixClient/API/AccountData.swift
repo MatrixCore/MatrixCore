@@ -30,7 +30,7 @@ public struct MatrixGetAccountData<T: MatrixAccountData>: MatrixResponse, Matrix
                            with parameters: RequestParameter) throws -> URLComponents
     {
         guard let fqmxid = parameters.userID.FQMXID else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
 
         if let roomID = parameters.roomID {
@@ -66,7 +66,7 @@ public struct MatrixSetAccountData<T: MatrixAccountData>: MatrixRequest {
                            with parameters: MatrixGetAccountData<T>.RequestParameter) throws -> URLComponents
     {
         guard let fqmxid = parameters.userID.FQMXID else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
 
         if let roomID = parameters.roomID {
@@ -90,7 +90,7 @@ public extension MatrixAccountData {
 
     func components(for homeserver: MatrixHomeserver, with userID: MatrixUserIdentifier) throws -> URLComponents {
         guard let fqmxid = userID.FQMXID else {
-            throw MatrixError.NotFound
+            throw MatrixErrorCode.NotFound
         }
         return homeserver.path("/_matrix/client/v3/user/\(fqmxid)/account_data/\(Self.type)")
     }

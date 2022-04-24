@@ -34,7 +34,7 @@ extension MatrixFilterRequest: MatrixRequest {
             let userId = parameters.user,
             let filterId = parameters.filter
         else {
-            throw MatrixError.Unrecognized
+            throw MatrixErrorCode.Unrecognized
         }
 
         var components = homeserver.url

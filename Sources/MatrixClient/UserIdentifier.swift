@@ -166,7 +166,7 @@ extension MatrixUserIdentifier: Codable {
         if let id = id {
             self = id
         } else {
-            throw MatrixError.BadJSON
+            throw MatrixErrorCode.BadJSON
         }
     }
 
@@ -236,7 +236,7 @@ extension MatrixFullUserIdentifier: Codable {
         if let id = id {
             self = id
         } else {
-            throw MatrixError.BadJSON
+            throw MatrixErrorCode.BadJSON
         }
     }
 

@@ -52,7 +52,7 @@ public extension MatrixRequest {
 
         if Self.requiresAuth {
             guard let token = token else {
-                throw MatrixError.Forbidden
+                throw MatrixErrorCode.Forbidden
             }
             urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
@@ -101,7 +101,7 @@ public extension MatrixRequest {
         let (data, urlResponse) = try await urlSession.data(for: request)
 
         guard let response = urlResponse as? HTTPURLResponse else {
-            throw MatrixError.Unknown
+            throw MatrixErrorCode.Unknown
         }
 
         return (data, response)
@@ -140,7 +140,7 @@ public extension MatrixRequest {
             guard let response = response as? HTTPURLResponse,
                   let data = data
             else {
-                callback(.failure(MatrixError.Unknown))
+                callback(.failure(MatrixErrorCode.Unknown))
                 return
             }
 
