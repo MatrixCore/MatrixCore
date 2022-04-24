@@ -5,6 +5,7 @@
 //  Created by Finn Behrens on 07.08.21.
 //
 
+import AnyCodable
 import Foundation
 
 public enum MatrixCommonErrorCode: String, Error, Codable {
@@ -250,6 +251,13 @@ public extension MatrixErrorCode {
 }
 
 public struct MatrixServerError: Error, Codable {
+    public init(errcode: MatrixErrorCode, error: String, code: Int? = nil, extraInfo: [String: AnyCodable] = [:]) {
+        self.errcode = errcode
+        self.error = error
+        self.code = code
+        self.extraInfo = extraInfo
+    }
+
     /// Error code
     public var errcode: MatrixErrorCode
 
@@ -259,30 +267,128 @@ public struct MatrixServerError: Error, Codable {
     /// HTTP status code
     public var code: Int?
 
+    public var interactiveAuth: MatrixInteractiveAuth?
+
+    public var extraInfo: [String: AnyCodable]
+
     // TODO: extra data
 
     public init(json: Data, code: Int? = nil) throws {
         let decoder = JSONDecoder()
+        decoder.userInfo[.matrixErrorHttpCode] = code
 
         do {
             self = try decoder.decode(Self.self, from: json)
         } catch {
-            throw MatrixInvalidError(data: json, code: code)
+            throw MatrixServerError(
+                errcode: .Unknown,
+                error: error.localizedDescription,
+                code: code,
+                extraInfo: ["json": .init(json)]
+            )
         }
         self.code = code
     }
 }
 
-public struct MatrixInvalidError: Error, LocalizedError {
-    public var data: Data
-    public var code: Int?
+public extension MatrixServerError {
+    internal enum KnownCodingKeys: String, CodingKey, CaseIterable {
+        case errcode
+        case error
 
-    public init(data: Data, code: Int? = nil) {
-        self.data = data
-        self.code = code
+        static let extraIgnoreValues = [
+            "session",
+            "flows",
+            "params",
+            "completed",
+        ]
+
+        static func doesNotContain(_ key: DynamicCodingKeys) -> Bool {
+            !Self.allCases.map(\.stringValue).contains(key.stringValue) && !Self.extraIgnoreValues
+                .contains(key.stringValue)
+        }
     }
 
-    var localisedDescription: String {
-        NSLocalizedString("Failed to parse error result for code \(code ?? -1)", comment: "MatrixInvalidError")
+    internal struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+
+        // not used here, but a protocol requirement
+        var intValue: Int?
+        init?(intValue _: Int) {
+            nil
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: KnownCodingKeys.self)
+        errcode = try container.decodeIfPresent(MatrixErrorCode.self, forKey: .errcode) ?? .Unknown
+        error = try container.decodeIfPresent(String.self, forKey: .error) ?? ""
+
+        extraInfo = [:]
+        let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+
+        for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
+            let decoded = try extraContainer.decode(
+                AnyCodable.self,
+                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+            )
+            self.extraInfo[key.stringValue] = decoded
+        }
+
+        guard let code = decoder.userInfo[.matrixErrorHttpCode] as? Int,
+              code == 401
+        else {
+            return
+        }
+
+        do {
+            interactiveAuth = try MatrixInteractiveAuth(from: decoder)
+        } catch {
+            // don't care if it fails
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: KnownCodingKeys.self)
+        try container.encode(errcode, forKey: .errcode)
+        try container.encode(error, forKey: .error)
+
+        var extraContainer = encoder.container(keyedBy: DynamicCodingKeys.self)
+        for (name, value) in extraInfo {
+            try extraContainer.encode(value, forKey: .init(stringValue: name)!)
+        }
+    }
+}
+
+public extension MatrixServerError {
+    var is401: Bool {
+        errcode == .Unauthorized && code == 401
+    }
+
+    var is404: Bool {
+        errcode == .NotFound && code == 404
+    }
+
+    var isTokenError: Bool {
+        errcode == .UnknownToken || errcode == .MissingToken
+    }
+
+    var isLimitexceededError: Bool {
+        code == 429 && errcode == .LimitExceeded
+    }
+
+    var shouldbeRetried: Bool {
+        // Investigate network error codes
+        isLimitexceededError
+    }
+}
+
+extension CodingUserInfoKey {
+    /// The key used to determine the types of `MatrixEvent` that can be decoded.
+    static var matrixErrorHttpCode: CodingUserInfoKey {
+        CodingUserInfoKey(rawValue: "MatrixClient.ErrorHttpCode")!
     }
 }

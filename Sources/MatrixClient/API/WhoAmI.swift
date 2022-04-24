@@ -1,6 +1,6 @@
 //
 //  WhoAmI.swift
-//  
+//
 //
 //  Created by Finn Behrens on 23.04.22.
 //
@@ -8,7 +8,7 @@
 import Foundation
 
 public struct MatrixWhoAmIRequest: MatrixRequest {
-    public func components(for homeserver: MatrixHomeserver, with parameters: ()) throws -> URLComponents {
+    public func components(for homeserver: MatrixHomeserver, with _: ()) throws -> URLComponents {
         homeserver.path("/_matrix/client/v3/account/whoami")
     }
 

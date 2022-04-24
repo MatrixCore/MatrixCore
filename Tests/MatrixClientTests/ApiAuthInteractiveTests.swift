@@ -15,7 +15,7 @@ final class ApiAuthInteractiveTests: XCTestCase {
         MatrixInteractiveAuth
             .Flow(stages: [MatrixLoginFlow.recaptcha, MatrixLoginFlow.token, MatrixLoginFlow.oauth2,
                            MatrixLoginFlow.email]),
-    ], params: [:], session: nil, completed: [MatrixLoginFlow.email, MatrixLoginFlow.terms], error: nil, errcode: nil)
+    ], params: [:], session: nil, completed: [MatrixLoginFlow.email, MatrixLoginFlow.terms])
 
     func testIsOptional() throws {
         XCTAssertTrue(flow.isOptional(.recaptcha))

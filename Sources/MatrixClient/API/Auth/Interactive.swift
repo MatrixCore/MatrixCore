@@ -13,16 +13,12 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         flows: [MatrixInteractiveAuth.Flow],
         params: [String: AnyCodable],
         session: String? = nil,
-        completed: [MatrixLoginFlow]? = nil,
-        error: String? = nil,
-        errcode: MatrixErrorCode? = nil
+        completed: [MatrixLoginFlow]? = nil
     ) {
         self.flows = flows
         self.params = params
         self.session = session
         self.completed = completed
-        self.error = error
-        self.errcode = errcode
     }
 
     public var flows: [Flow]
@@ -37,9 +33,6 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     public var session: String?
 
     public var completed: [MatrixLoginFlow]?
-
-    public var error: String?
-    public var errcode: MatrixErrorCode?
 
     // MARK: Dynamic vars
 
@@ -100,8 +93,6 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         case flows
         case params
         case completed
-        case error
-        case errcode
     }
 
     public struct LoginFlowWithParams {

@@ -36,15 +36,16 @@ public extension MatrixClient {
 
     @available(swift, introduced: 5.5)
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
-    func getRegisterFlows(kind: MatrixRegisterRequest.RegisterKind = .user) async throws -> MatrixInteractiveAuth {
-        let resp = try await MatrixRegisterRequest(password: "")
-            .response(on: homeserver, with: kind, withUrlSession: urlSession)
-
-        switch resp {
-        case let .interactive(flows):
-            return flows
-        default:
-            throw MatrixErrorCode.NotFound
+    func getRegisterFlows(kind: MatrixRegisterRequest.RegisterKind = .user) async throws -> MatrixInteractiveAuth? {
+        do {
+            _ = try await MatrixRegisterRequest(password: "")
+                .response(on: homeserver, with: kind, withUrlSession: urlSession)
+            return nil
+        } catch let error as MatrixServerError {
+            guard let interactive = error.interactiveAuth else {
+                throw error
+            }
+            return interactive
         }
     }
 
@@ -72,7 +73,7 @@ public extension MatrixClient {
         auth: MatrixInteractiveAuthResponse? = nil,
         bind_email: Bool? = nil,
         kind: MatrixRegisterRequest.RegisterKind = .user
-    ) async throws -> MatrixRegisterContainer {
+    ) async throws -> MatrixRegister {
         try await MatrixRegisterRequest(
             username: username,
             bindEmail: bind_email,

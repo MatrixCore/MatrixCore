@@ -52,7 +52,7 @@ final class ApiCapabilityTests: XCTestCase {
             .value as? [String: Any],
             let ratelimit = ratelimitContainer["max_requests_per_hour"] as? Int
         else {
-            throw MatrixError.BadJSON
+            throw MatrixErrorCode.BadJSON
         }
 
         XCTAssertEqual(ratelimit, 600)

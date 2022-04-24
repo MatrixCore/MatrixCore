@@ -64,22 +64,10 @@ extension MatrixRegisterRequest: MatrixRequest {
         false
     }
 
-    public typealias Response = MatrixRegisterContainer
+    public typealias Response = MatrixRegister
 
     /// The kind of account to register. Defaults to user.
     public typealias URLParameters = MatrixRegisterRequest.RegisterKind
-
-    public func parse(data: Data, response: HTTPURLResponse) throws -> Response {
-        guard response.statusCode != 401 else {
-            return try MatrixRegisterContainer.interactive(.init(fromMatrixRequestData: data))
-        }
-
-        guard response.statusCode == 200 else {
-            throw try MatrixServerError(json: data, code: response.statusCode)
-        }
-
-        return try MatrixRegisterContainer.success(.init(fromMatrixRequestData: data))
-    }
 }
 
 public struct MatrixRegister: MatrixResponse {
@@ -118,39 +106,6 @@ public struct MatrixRegister: MatrixResponse {
         case homeServer = "home_server"
         case refreshToken = "refresh_token"
         case userID = "user_id"
-    }
-}
-
-/// Container to either hold a successfully register answer, or an answer to do it interactivly.
-public enum MatrixRegisterContainer: MatrixResponse {
-    case success(MatrixRegister)
-    case interactive(MatrixInteractiveAuth)
-
-    public var isSuccess: Bool {
-        switch self {
-        case .success:
-            return true
-        case .interactive:
-            return false
-        }
-    }
-
-    public var successData: MatrixRegister? {
-        switch self {
-        case let .success(register):
-            return register
-        case .interactive:
-            return nil
-        }
-    }
-
-    public var interactiveData: MatrixInteractiveAuth? {
-        switch self {
-        case .success:
-            return nil
-        case let .interactive(interactive):
-            return interactive
-        }
     }
 }
 
