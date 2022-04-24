@@ -19,13 +19,10 @@ public struct MatrixClient {
     ///
     /// Add any custom events you would like decoded to this array.
     public static var eventTypes: [MatrixEvent.Type] = [
-        MatrixEncryptionEvent.self,
-        MatrixMemberEvent.self,
+        MatrixStateEvent.self,
         MatrixMessageEvent.self,
-        MatrixNameEvent.self,
         MatrixReactionEvent.self,
         MatrixRedactionEvent.self,
-        MatrixRoomCreateEvent.self,
     ]
 
     public static var messageTypes: [MatrixMessageType.Type] = [
@@ -37,6 +34,19 @@ public struct MatrixClient {
         MatrixMessageAudio.self,
         MatrixMessageLocation.self,
         MatrixMessageVideo.self,
+    ]
+
+    public static var stateTypes: [MatrixStateEventType.Type] = [
+        MatrixRoomCanonicalAliasEvent.self,
+        MatrixRoomCreateEvent.self,
+        MatrixRoomJoinRulesEvent.self,
+        MatrixRoomMemberEvent.self,
+        MatrixRoomPowerLevelsEvent.self,
+        MatrixRoomNameEvent.self,
+        MatrixRoomTopicEvent.self,
+        MatrixRoomAvatarEvent.self,
+        MatrixRoomPinnedEvents.self,
+        MatrixRoomEncryptionEvent.self,
     ]
 
     @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)

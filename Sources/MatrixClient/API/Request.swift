@@ -203,6 +203,8 @@ public extension MatrixResponse {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
         decoder.userInfo[.matrixEventTypes] = MatrixClient.eventTypes
+        decoder.userInfo[.matrixMessageTypes] = MatrixClient.messageTypes
+        decoder.userInfo[.matrixStateEventTypes] = MatrixClient.stateTypes
         self = try decoder.decode(Self.self, from: data)
     }
 }

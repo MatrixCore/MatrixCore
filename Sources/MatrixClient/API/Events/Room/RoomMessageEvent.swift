@@ -7,7 +7,7 @@ public struct MatrixMessageEvent: MatrixEvent {
     @MatrixCodableMessageType
     public var content: MatrixMessageType
     public var eventID: String?
-    public var sender: String?
+    public var sender: MatrixFullUserIdentifier?
     public var date: Date?
     public var unsigned: AnyCodable?
 

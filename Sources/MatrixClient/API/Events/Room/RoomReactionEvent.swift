@@ -6,7 +6,7 @@ public struct MatrixReactionEvent: MatrixEvent {
 
     public var content: Content
     public var eventID: String?
-    public var sender: String?
+    public var sender: MatrixFullUserIdentifier?
     public var date: Date?
     public var unsigned: AnyCodable?
 

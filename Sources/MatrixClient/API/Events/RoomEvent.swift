@@ -8,14 +8,15 @@ public protocol MatrixEvent: Codable {
     static var type: String { get }
 
     var eventID: String? { get }
-    var sender: String? { get }
+    var sender: MatrixFullUserIdentifier? { get }
     var date: Date? { get }
     var unsigned: AnyCodable? { get }
 }
 
 /// The coding keys needed to determine an event's type before decoding.
-enum MatrixEventTypeKeys: CodingKey {
+enum MatrixEventTypeKeys: String, CodingKey {
     case type
+    case stateKey = "state_key"
 }
 
 enum MatrixEventCodableError: Error {
@@ -38,6 +39,29 @@ extension CodingUserInfoKey {
     }
 }
 
+public struct MatrixInvalidEvent: MatrixEvent {
+    public static let type: String = ""
+
+    public var type: String?
+
+    public var eventID: String?
+
+    public var sender: MatrixFullUserIdentifier?
+
+    public var date: Date? {
+        nil
+    }
+
+    public var unsigned: AnyCodable? {
+        nil
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
+        case sender
+    }
+}
+
 // TODO: encodable
 @propertyWrapper
 public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Element == MatrixEvent {
@@ -51,28 +75,51 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
             // these can throw as something has gone seriously wrong if the type key is missing
             let container = try decoder.container(keyedBy: MatrixEventTypeKeys.self)
             let typeID = try container.decode(String.self, forKey: .type)
+            let stateKey = try container.decodeIfPresent(String.self, forKey: .stateKey)
 
-            guard let types = decoder.userInfo[.matrixEventTypes] as? [MatrixEvent.Type] else {
-                // the decoder must be supplied with some event types to decode
-                throw MatrixEventCodableError.missingTypes
-            }
+            do {
+                if stateKey != nil {
+                    let stateEvent = try MatrixStateEvent(from: decoder)
+                    guard let decoded = stateEvent as? T
+                    else {
+                        throw MatrixEventCodableError.unableToCast(decoded: stateEvent, into: "state_event")
+                    }
+                    wrappedEvent = decoded
+                    return
+                }
 
-            guard let matchingType = types.first(where: { $0.type == typeID }) else {
-                // simply ignore events with no matching type as throwing would prevent access to other events
+                guard let types = decoder.userInfo[.matrixEventTypes] as? [MatrixEvent.Type] else {
+                    // the decoder must be supplied with some event types to decode
+                    throw MatrixEventCodableError.missingTypes
+                }
+
+                guard let matchingType = types.first(where: { $0.type == typeID }) else {
+                    // simply ignore events with no matching type as throwing would prevent access to other events
+                    return
+                }
+
+                guard let decoded = try? matchingType.init(from: decoder) else {
+                    assertionFailure("Failed to decode MatrixEvent as \(String(describing: T.self))")
+                    return
+                }
+
+                guard let decoded = decoded as? T else {
+                    // something has probably gone very wrong at this stage
+                    throw MatrixEventCodableError.unableToCast(decoded: decoded, into: String(describing: T.self))
+                }
+                wrappedEvent = decoded
                 return
-            }
+            } catch {
+                print(error.localizedDescription)
+                var event = try! MatrixInvalidEvent(from: decoder)
+                event.type = typeID
 
-            guard let decoded = try? matchingType.init(from: decoder) else {
-                assertionFailure("Failed to decode MatrixEvent as \(String(describing: T.self))")
-                return
-            }
+                guard let decoded = event as? T else {
+                    throw MatrixEventCodableError.missingTypes
+                }
 
-            guard let decoded = decoded as? T else {
-                // something has probably gone very wrong at this stage
-                throw MatrixEventCodableError.unableToCast(decoded: decoded, into: String(describing: T.self))
+                wrappedEvent = decoded
             }
-
-            wrappedEvent = decoded
         }
 
         func encode(to encoder: Encoder) throws {
@@ -97,11 +144,15 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
     }
 
     public init(from decoder: Decoder) {
-        guard let container = try? decoder.singleValueContainer(),
-              let wrappers = try? container.decode([EventWrapper<Value.Element>].self)
-        else { return }
-
-        wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
+        do {
+            let container = try decoder.singleValueContainer()
+            let wrappers = try container.decode([EventWrapper<Value.Element>].self)
+            wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
+        } catch {
+            if #available(iOS 14.0, *) {
+                MatrixClient.logger.warning("Failed to parse sync: \(error.localizedDescription)")
+            } else {}
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
