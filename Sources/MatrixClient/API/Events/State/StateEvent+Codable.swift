@@ -23,7 +23,7 @@ public extension CodingUserInfoKey {
 }
 
 @propertyWrapper
-public struct MatrixCodableStateEventType {
+public struct MatrixCodableStateEventType: Encodable {
     public var wrappedValue: MatrixStateEventType
 
     public init(wrappedValue: MatrixStateEventType) {
@@ -61,9 +61,5 @@ public struct MatrixCodableStateEventType {
                 return NSLocalizedString("Type \(type) could not be found", comment: "")
             }
         }
-    }
-
-    struct Container<T: MatrixStateEventType>: Codable {
-        var content: T
     }
 }

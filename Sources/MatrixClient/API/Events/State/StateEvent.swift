@@ -31,6 +31,20 @@ public struct MatrixRoomCanonicalAliasEvent: MatrixStateEventType {
 
 /// This is the first event in a room and cannot be changed. It acts as the root of all other events.
 public struct MatrixRoomCreateEvent: MatrixStateEventType {
+    public init(
+        creator: MatrixFullUserIdentifier,
+        federate: Bool? = nil,
+        predecessor: MatrixRoomCreateEvent.PreviousRoom? = nil,
+        roomVersion: String? = nil,
+        roomType: String? = nil
+    ) {
+        self.creator = creator
+        self.federate = federate
+        self.predecessor = predecessor
+        self.roomVersion = roomVersion
+        self.roomType = roomType
+    }
+
     public static let type = "m.room.create"
 
     /// The ``MatrixFullUserIdentifier`` of the room creator.
@@ -54,7 +68,7 @@ public struct MatrixRoomCreateEvent: MatrixStateEventType {
     /// Unspecified room types are possible using Namespaced Identifiers.
     public var roomType: String?
 
-    public struct PreviousRoom: Codable {
+    public struct PreviousRoom: Codable, Equatable, Hashable {
         /// The event ID of the last known event in the old room.
         public var eventID: String
 

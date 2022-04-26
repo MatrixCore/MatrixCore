@@ -9,11 +9,27 @@ import AnyCodable
 import Foundation
 
 public struct MatrixStateEvent: MatrixEvent {
+    public init(
+        eventID: String? = nil,
+        stateKey: String = "",
+        sender: MatrixFullUserIdentifier? = nil,
+        date: Date? = nil,
+        unsigned: AnyCodable? = nil,
+        content: MatrixStateEventType
+    ) {
+        self.stateKey = stateKey
+        self.eventID = eventID
+        self.sender = sender
+        self.date = date
+        self.unsigned = unsigned
+        self.content = content
+    }
+
     public static let type: String = ""
 
     /// The content of the event.
     @MatrixCodableStateEventType
-    var content: MatrixStateEventType
+    public var content: MatrixStateEventType
 
     public var stateKey: String = ""
 

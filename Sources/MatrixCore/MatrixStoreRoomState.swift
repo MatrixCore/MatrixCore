@@ -12,6 +12,6 @@ public protocol MatrixStoreRoomState {
     var eventId: String { get }
     var roomId: String { get }
     var stateKey: String { get }
-    var contentType: String { get }
+    var sender: MatrixFullUserIdentifier? { get }
     var content: MatrixStateEventType { get }
 }

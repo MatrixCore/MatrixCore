@@ -149,7 +149,7 @@ public struct MatrixCodableEvents<Value: Collection>: Codable where Value.Elemen
             let wrappers = try container.decode([EventWrapper<Value.Element>].self)
             wrappedValue = wrappers.compactMap(\.wrappedEvent) as? Value
         } catch {
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.0, macOS 11.0, *) {
                 MatrixClient.logger.warning("Failed to parse sync: \(error.localizedDescription)")
             } else {}
         }
