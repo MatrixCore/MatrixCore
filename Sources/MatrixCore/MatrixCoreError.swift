@@ -8,8 +8,11 @@
 import Foundation
 
 public enum MatrixCoreError: Error {
-    case actorMissing
     case missingData
+    case syncAlreadyStarted
+    case syncNotRunning
+
+    case actorMissing
     case creationError
     case batchInsertError
     case batchDeleteError
@@ -21,13 +24,18 @@ public enum MatrixCoreError: Error {
 extension MatrixCoreError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .actorMissing:
-            return NSLocalizedString("Did not found MatrixCore instance to use for request", comment: "")
         case .missingData:
             return NSLocalizedString(
                 "Found and will discard a quake missing a valid code, magnitude, place, or time.",
                 comment: ""
             )
+        case .syncAlreadyStarted:
+            return NSLocalizedString("Sync Task already started", comment: "MatrixCore.startSync()")
+        case .syncNotRunning:
+            return NSLocalizedString("Sync Task not running", comment: "MatrixCore.stopSync()")
+
+        case .actorMissing:
+            return NSLocalizedString("Did not found MatrixCore instance to use for request", comment: "")
         case .creationError:
             return NSLocalizedString("Failed to create a new Quake object.", comment: "")
         case .batchInsertError:

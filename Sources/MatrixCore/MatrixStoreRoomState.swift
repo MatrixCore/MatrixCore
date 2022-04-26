@@ -14,4 +14,6 @@ public protocol MatrixStoreRoomState {
     var stateKey: String { get }
     var sender: MatrixFullUserIdentifier? { get }
     var content: MatrixStateEventType { get }
+
+    init(roomId: String, event: MatrixStateEvent) throws
 }

@@ -16,7 +16,9 @@ public struct MatrixSyncRequest: MatrixRequest {
         }
 
         // TODO: fullState
-        // TODO: presence
+        if let presence = parameters.presence {
+            queryItems.append(URLQueryItem(name: "set_presence", value: presence.rawValue))
+        }
 
         if let timeout = parameters.timeout {
             queryItems.append(URLQueryItem(name: "timeout", value: String(timeout)))
@@ -36,11 +38,11 @@ public struct MatrixSyncRequest: MatrixRequest {
     public static var requiresAuth = true
 
     public struct Parameters {
-        public let filter: String?
-        public let since: String?
-        public let fullState: Bool?
-        public let presence: Presence?
-        public let timeout: Int?
+        public var filter: String?
+        public var since: String?
+        public var fullState: Bool?
+        public var presence: Presence?
+        public var timeout: Int?
 
         public enum Presence: String {
             case online

@@ -17,6 +17,16 @@ public class MatrixCore<T: MatrixStore> {
 
     public var client: MatrixClient
 
+    // MARK: sync
+
+    internal var syncTask: Task<Void, Never>?
+    public var presence: MatrixSyncRequest.Parameters.Presence = .offline
+
+    deinit {
+        // cancel unconditionally if the task is not nil
+        self.syncTask?.cancel()
+    }
+
     // MARK: - computed variables
 
     public var id: T.AccountInfo.AccountIdentifier {
