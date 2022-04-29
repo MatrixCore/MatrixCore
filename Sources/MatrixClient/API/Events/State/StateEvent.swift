@@ -392,3 +392,64 @@ public struct MatrixRoomEncryptionEvent: MatrixStateEventType {
         case RotationPeriodMsgs = "rotation_period_msgs"
     }
 }
+
+///
+///
+/// # Removing
+///
+/// When removing a bridge, you simply need to send a new state event with the same `state_key` with a `content` of `{}`.
+/// This is because matrix does not yet have a mechanism to remove a state event in it's entireity.
+public struct MatrixRoomBridgeEvent: MatrixStateEventType {
+    public static let type: String = "m.bridge"
+    public static let unstableType: String = "uk.half-shot.bridge"
+
+    /// Should be the MXID of the bridge bot.
+    ///
+    /// It is important to note that `sender` should not be presumed to be the bridge bot.
+    /// This is because room upgrades, other bridges or admins could also set the state in the room on behalf of the bridge bot.
+    public var bridgebot: MatrixFullUserIdentifier?
+
+    /// The name of the user which provisioned the bridge.
+    ///
+    /// In the case of alias based bridges, where the creator is not known it should be omitted.
+    public var creator: MatrixFullUserIdentifier?
+
+    /// Describes the protocol that is being bridged.
+    ///
+    /// For example, it may be `"IRC"`, `"Slack"`, or `"Discord"`.
+    /// This field does not describe the low level protocol the bridge is using to access the network,
+    /// but a common user recongnisable name.
+    public var `protocol`: External?
+
+    /// Should be information about the specific network the bridge is connected to.
+    ///
+    /// It's important to make the distinction here that this does NOT describe the protocol name, but the specific network the user is on.
+    /// For protocols that do not have the concept of a network, this field may be omitted.
+    public var network: External?
+
+    /// Should be information about the specific channel the room is connected to.
+    public var channel: External?
+
+    public struct External: Codable {
+        /// Case-insensitive and should be lowercase.
+        ///
+        /// Uppercase characters should be escaped (e.g. using QP encoding or similar).The purpose of the id field is not to be human
+        /// readable but just for comparing within the same bridge type, hence no encoding standard will be enforced in this proposal.
+        public var id: String
+        public var displayname: String?
+        public var avatarUrl: String?
+        public var externalUrl: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id
+            case displayname
+            case avatarUrl = "avatar_url"
+            case externalUrl = "external_url"
+        }
+    }
+
+    /// Test if this state event is a redaction of an old bridge information.
+    public var isEmpty: Bool {
+        bridgebot == nil && `protocol` == nil && channel == nil
+    }
+}

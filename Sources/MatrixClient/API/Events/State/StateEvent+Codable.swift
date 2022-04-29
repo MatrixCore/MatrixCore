@@ -9,6 +9,12 @@ import Foundation
 
 public protocol MatrixStateEventType: Codable {
     static var type: String { get }
+
+    static var unstableType: String? { get }
+}
+
+public extension MatrixStateEventType {
+    static var unstableType: String? { nil }
 }
 
 enum MatrixStateEventTypeCodingKeys: String, CodingKey {
@@ -35,7 +41,7 @@ public struct MatrixCodableStateEventType: Encodable {
             throw StateTypeError.missingTypes
         }
 
-        guard let matchingType = types.first(where: { $0.type == typeID }) else {
+        guard let matchingType = types.first(where: { $0.type == typeID || $0.unstableType == typeID }) else {
             throw StateTypeError.unableToFindType(typeID)
         }
 
