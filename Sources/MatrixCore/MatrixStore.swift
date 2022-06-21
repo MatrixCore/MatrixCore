@@ -9,50 +9,44 @@ import Foundation
 import MatrixClient
 import OSLog
 
+@available(swift, introduced: 5.5)
+@available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 public protocol MatrixStore {
     // MARK: - Account Info
 
     /// Type for Account Informations.
     associatedtype AccountInfo: MatrixStoreAccountInfo
-    associatedtype RoomState: MatrixStoreRoomState
+    //associatedtype RoomState: MatrixStoreRoomState
+    //associatedtype AccountMapping: MatrixStoreAccountRoom
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func saveAccountInfo(account: AccountInfo) async throws
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getAccountInfo(accountID: AccountInfo.AccountIdentifier) async throws -> AccountInfo
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getAccountInfos() async throws -> [AccountInfo]
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func deleteAccountInfo(account: AccountInfo) async throws
 
     // MARK: - Room
 
+    // MARK: Account Room Mapping
+    /*func addAccountMapping(accountId: MatrixFullUserIdentifier, roomId: String) async throws
+    func addAccountMapping(_ mapping: AccountMapping) async throws
+    func getAccountMapping(accountId: MatrixFullUserIdentifier, roomId: String) async throws -> AccountMapping
+    func getRoomsForAccount(accountI: MatrixFullUserIdentifier) async throws -> [AccountMapping]
+    func getAccountsForRoom(roomId: MatrixFullUserIdentifier) async throws -> [AccountMapping]*/
+
+
+
+
     // MARK: Room State
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
-    func addRoomState(state: RoomState) async throws
+    /*func addRoomState(state: RoomState) async throws
 
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRoomState(roomId: String) async throws -> [RoomState]
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRoomState(eventId: String) async throws -> RoomState?
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRoomState(roomId: String, stateType: String) async throws -> [RoomState]
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRoomState(roomId: String, stateKey: String) async throws -> [RoomState]
-    @available(swift, introduced: 5.5)
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func getRoomState(roomId: String, stateType: String, stateKey: String) async throws -> [RoomState]
+     */
 }

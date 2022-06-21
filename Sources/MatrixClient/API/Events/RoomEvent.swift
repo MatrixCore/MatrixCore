@@ -11,6 +11,16 @@ public protocol MatrixEvent: Codable {
     var sender: MatrixFullUserIdentifier? { get }
     var date: Date? { get }
     var unsigned: AnyCodable? { get }
+
+    //var content: MatrixCodableContent { get }
+
+    //var stateKey: String? { get }
+}
+
+public extension MatrixEvent {
+    var stateKey: String? {
+        nil
+    }
 }
 
 /// The coding keys needed to determine an event's type before decoding.
@@ -54,6 +64,11 @@ public struct MatrixInvalidEvent: MatrixEvent {
 
     public var unsigned: AnyCodable? {
         nil
+    }
+
+    // FIXME: implement
+    public var content: Bool {
+        false
     }
 
     enum CodingKeys: String, CodingKey {

@@ -8,6 +8,8 @@
 import Foundation
 import MatrixClient
 
+let MXkSecAttrLabel: String = "dev.matrixcore.access_token"
+
 public protocol MatrixStoreAccountInfo {
     associatedtype AccountIdentifier
 
@@ -18,19 +20,38 @@ public protocol MatrixStoreAccountInfo {
     var mxID: MatrixFullUserIdentifier { get }
     var homeServer: MatrixHomeserver { get }
     var accessToken: String? { get set }
+    
+    var FQMXID: String { get }
+    
+    // Keychain functions
+    func saveToKeychain(extraKeychainArguments: [String: Any]) throws
+    static func getFromKeychain(account: MatrixFullUserIdentifier,
+                                extraKeychainArguments: [String: Any]) throws -> String
+    func deleteFromKeychain(extraKeychainArguments: [String: Any]) throws
+    
+    mutating func loadAccessToken(extraKeychainArguments: [String: Any]) throws
 }
 
 // TODO: only on Darwin platforms
 public extension MatrixStoreAccountInfo {
+    static func addDefaultInfo(_ dict: [String: Any], mxID: MatrixFullUserIdentifier) -> [String: Any] {
+        var dict = dict
+        dict[kSecClass as String] = kSecClassGenericPassword
+        dict[kSecAttrAccount as String] = mxID.FQMXID
+        //dict[kSecUseDataProtectionKeychain as String] = true
+        if dict[kSecAttrLabel as String] == nil {
+            dict[kSecAttrLabel as String] = MXkSecAttrLabel
+        }
+        
+        return dict
+    }
+    
     /// Load the ``accessToken`` from Keychain.
     static func getFromKeychain(account: MatrixFullUserIdentifier,
                                 extraKeychainArguments: [String: Any] = [:]) throws -> String
     {
-        var keychainQuery = extraKeychainArguments
-        keychainQuery[kSecClass as String] = kSecClassInternetPassword
+        var keychainQuery = Self.addDefaultInfo(extraKeychainArguments, mxID: account)
         keychainQuery[kSecMatchLimit as String] = kSecMatchLimitOne
-        keychainQuery[kSecAttrAccount as String] = account.FQMXID
-        keychainQuery[kSecAttrServer as String] = account.domain
         keychainQuery[kSecReturnAttributes as String] = true
         keychainQuery[kSecReturnData as String] = true
 
@@ -57,10 +78,7 @@ public extension MatrixStoreAccountInfo {
             throw MatrixErrorCode.NotFound
         }
 
-        var keychainInsertQuery = extraKeychainArguments
-        keychainInsertQuery[kSecClass as String] = kSecClassInternetPassword
-        keychainInsertQuery[kSecAttrAccount as String] = mxID.FQMXID
-        keychainInsertQuery[kSecAttrServer as String] = mxID.domain
+        var keychainInsertQuery = Self.addDefaultInfo(extraKeychainArguments, mxID: mxID)
         keychainInsertQuery[kSecValueData as String] = accessToken
 
         let status = SecItemAdd(keychainInsertQuery as CFDictionary, nil)
@@ -70,15 +88,40 @@ public extension MatrixStoreAccountInfo {
     }
 
     func deleteFromKeychain(extraKeychainArguments: [String: Any] = [:]) throws {
-        var keychainQuery = extraKeychainArguments
-        keychainQuery[kSecClass as String] = kSecClassInternetPassword
-        keychainQuery[kSecAttrAccount as String] = mxID.FQMXID
-        keychainQuery[kSecAttrServer as String] = mxID.domain
+        var keychainQuery = Self.addDefaultInfo(extraKeychainArguments, mxID: mxID)
+        keychainQuery[kSecMatchLimit as String] = kSecMatchLimitOne
+        keychainQuery[kSecReturnRef as String] = true
+        keychainQuery[kSecReturnAttributes as String] = true
+
+        
+        /*var item: CFTypeRef?
+        var status = SecItemCopyMatching(keychainQuery as CFDictionary, &item)
+        guard status == errSecSuccess else {
+            throw MatrixCoreError.keychainError(status)
+        }
+         */
+
 
         let status = SecItemDelete(keychainQuery as CFDictionary)
         guard status == errSecSuccess else {
             throw MatrixCoreError.keychainError(status)
         }
+    }
+    
+    internal var accessTokenTag: String {
+        Self.accessTokenTag(forId: mxID)
+    }
+    
+    internal static func accessTokenTag(forId: MatrixFullUserIdentifier) -> String {
+        "dev.matrixcore.keychain.\(forId.FQMXID.replacingOccurrences(of: "@", with: ""))"
+    }
+    
+    func getFromKeychain(extraKeychainArguments: [String: Any] = [:]) throws -> String {
+        try Self.getFromKeychain(account: self.mxID, extraKeychainArguments: extraKeychainArguments)
+    }
+    
+    mutating func loadAccessToken(extraKeychainArguments: [String: Any] = [:]) throws {
+        try self.accessToken = self.getFromKeychain(extraKeychainArguments: extraKeychainArguments)
     }
 }
 

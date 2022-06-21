@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol MatrixStateEventType: Codable {
+public protocol MatrixStateEventType: MatrixCodableContent {
     static var type: String { get }
 
     static var unstableType: String? { get }

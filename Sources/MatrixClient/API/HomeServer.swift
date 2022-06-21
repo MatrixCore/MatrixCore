@@ -60,6 +60,10 @@ public struct MatrixHomeserver: Codable {
         components.path = path
         return components
     }
+    
+    public var string: String? {
+        self.url.string
+    }
 }
 
 public struct MatrixServerInfoRequest {}

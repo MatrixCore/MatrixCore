@@ -36,7 +36,7 @@ public struct MatrixRoomCreateEvent: MatrixStateEventType {
         federate: Bool? = nil,
         predecessor: MatrixRoomCreateEvent.PreviousRoom? = nil,
         roomVersion: String? = nil,
-        roomType: String? = nil
+        roomType: RoomType? = nil
     ) {
         self.creator = creator
         self.federate = federate
@@ -66,7 +66,7 @@ public struct MatrixRoomCreateEvent: MatrixStateEventType {
     /// Optional room type to denote a room’s intended function outside of traditional conversation.
     ///
     /// Unspecified room types are possible using Namespaced Identifiers.
-    public var roomType: String?
+    public var roomType: RoomType?
 
     public struct PreviousRoom: Codable, Equatable, Hashable {
         /// The event ID of the last known event in the old room.
@@ -87,6 +87,18 @@ public struct MatrixRoomCreateEvent: MatrixStateEventType {
         case predecessor
         case roomVersion = "room_version"
         case roomType = "type"
+    }
+
+    public struct RoomType: RawRepresentable, Codable, ExpressibleByStringLiteral {
+        public var rawValue: String
+
+        public init?(rawValue: String){
+            self.rawValue = rawValue
+        }
+
+        public init(stringLiteral value: StringLiteralType) {
+            self.init(rawValue: value)!
+        }
     }
 }
 

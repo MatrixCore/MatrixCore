@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Messag types
 
-public protocol MatrixMessageType: Codable {
+public protocol MatrixMessageType: MatrixCodableContent {
     static var type: String { get }
 }
 
@@ -25,7 +25,7 @@ public extension CodingUserInfoKey {
 }
 
 @propertyWrapper
-public struct MatrixCodableMessageType: Codable {
+public struct MatrixCodableMessageType: MatrixCodableContent {
     public var wrappedValue: MatrixMessageType
 
     /// An initializer that allows initialization with a wrapped value of `nil`

@@ -194,3 +194,7 @@ public struct MatrixClient {
         }
     }
 }
+
+//public typealias MatrixCodableContent = Codable
+public protocol MatrixCodableContent: Codable {}
+

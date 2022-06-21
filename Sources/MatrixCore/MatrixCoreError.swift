@@ -26,7 +26,7 @@ extension MatrixCoreError: LocalizedError {
         switch self {
         case .missingData:
             return NSLocalizedString(
-                "Found and will discard a quake missing a valid code, magnitude, place, or time.",
+                "Data missing",
                 comment: ""
             )
         case .syncAlreadyStarted:

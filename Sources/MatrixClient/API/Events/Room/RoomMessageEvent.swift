@@ -12,7 +12,7 @@ public struct MatrixMessageEvent: MatrixEvent {
     public var unsigned: AnyCodable?
 
     enum CodingKeys: String, CodingKey {
-        case content
+        case content = "content"
         case eventID = "event_id"
         case sender
         case date = "origin_server_ts"

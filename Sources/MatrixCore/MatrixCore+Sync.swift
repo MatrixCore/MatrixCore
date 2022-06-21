@@ -7,7 +7,7 @@
 
 import Foundation
 import MatrixClient
-
+/*
 @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
 public extension MatrixCore {
     /// Start a task to sync
@@ -94,4 +94,4 @@ public extension MatrixCore {
         syncTask.cancel()
         self.syncTask = nil
     }
-}
+}*/

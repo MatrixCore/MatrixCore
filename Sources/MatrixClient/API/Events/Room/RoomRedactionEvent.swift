@@ -21,7 +21,7 @@ public struct MatrixRedactionEvent: MatrixEvent {
         case redacts
     }
 
-    public struct Content: Codable {
+    public struct Content: MatrixCodableContent {
         public let reason: String?
     }
 }
