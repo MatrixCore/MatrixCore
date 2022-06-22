@@ -21,7 +21,7 @@ public extension MatrixClient {
     func getLoginFlows() async throws -> [MatrixLoginFlow] {
         try await MatrixLoginFlowRequest()
             .response(on: homeserver, withToken: accessToken, with: (), withUrlSession: urlSession)
-            .flows.map(\.type)
+            .flows
     }
 
     /// Test if the server supports password authentication.
@@ -29,7 +29,7 @@ public extension MatrixClient {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func supportsPasswordAuth() async throws -> Bool {
         let flows = try await getLoginFlows()
-        return flows.contains(where: { $0 == MatrixLoginFlow.password })
+        return flows.contains(where: { $0.type == MatrixLoginFlowType.password })
     }
 
     // MARK: - Register
@@ -120,7 +120,7 @@ public extension MatrixClient {
         displayName: String? = nil,
         deviceId: String? = nil
     ) async throws -> MatrixLogin {
-        let flow: MatrixLoginFlow
+        let flow: MatrixLoginFlowType
         if token {
             flow = .token
         } else {

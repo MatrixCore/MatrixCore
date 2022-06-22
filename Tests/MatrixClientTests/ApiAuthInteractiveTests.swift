@@ -11,11 +11,11 @@ import XCTest
 
 final class ApiAuthInteractiveTests: XCTestCase {
     var flow = MatrixInteractiveAuth(flows: [
-        MatrixInteractiveAuth.Flow(stages: [MatrixLoginFlow.recaptcha, MatrixLoginFlow.terms, MatrixLoginFlow.email]),
+        MatrixInteractiveAuth.Flow(stages: [MatrixLoginFlowType.recaptcha, MatrixLoginFlowType.terms, MatrixLoginFlowType.email]),
         MatrixInteractiveAuth
-            .Flow(stages: [MatrixLoginFlow.recaptcha, MatrixLoginFlow.token, MatrixLoginFlow.oauth2,
-                           MatrixLoginFlow.email]),
-    ], params: [:], session: nil, completed: [MatrixLoginFlow.email, MatrixLoginFlow.terms])
+            .Flow(stages: [MatrixLoginFlowType.recaptcha, MatrixLoginFlowType.token, MatrixLoginFlowType.oauth2,
+                           MatrixLoginFlowType.email]),
+    ], params: [:], session: nil, completed: [MatrixLoginFlowType.email, MatrixLoginFlowType.terms])
 
     func testIsOptional() throws {
         XCTAssertTrue(flow.isOptional(.recaptcha))

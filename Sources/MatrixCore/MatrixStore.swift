@@ -20,6 +20,7 @@ public protocol MatrixStore {
     //associatedtype AccountMapping: MatrixStoreAccountRoom
 
     func saveAccountInfo(account: AccountInfo) async throws
+    func saveAccountInfo(_ mxID: MatrixFullUserIdentifier, name: String, homeServer: MatrixHomeserver, deviceId: String, accessToken: String?, saveToKeychain: Bool, extraKeychainArguments: [String: Any]) async throws -> AccountInfo
 
     func getAccountInfo(accountID: AccountInfo.AccountIdentifier) async throws -> AccountInfo
 

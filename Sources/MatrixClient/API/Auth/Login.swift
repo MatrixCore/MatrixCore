@@ -6,14 +6,11 @@
 //
 
 import Foundation
+import AnyCodable
 
 public struct MatrixLoginFlowRequest {
     public struct ResponseStruct: MatrixResponse {
-        var flows: [FlowType]
-
-        struct FlowType: Codable {
-            var type: MatrixLoginFlow
-        }
+        var flows: [MatrixLoginFlow]
     }
 }
 
@@ -35,7 +32,7 @@ extension MatrixLoginFlowRequest: MatrixRequest {
 
 @frozen
 /// A login type supported by the homeserver.
-public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
+public struct MatrixLoginFlowType: RawRepresentable, Codable, Equatable, Hashable {
     public typealias RawValue = String
 
     public var rawValue: String
@@ -68,7 +65,7 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     ///     }
     /// ```
     /// In the case that the homeserver does not know about the supplied 3PID, the homeserver must respond with 403 Forbidden.
-    public static let password: MatrixLoginFlow = "m.login.password"
+    public static let password: MatrixLoginFlowType = "m.login.password"
 
     /// The user completes a Google ReCaptcha 2.0 challenge
     ///
@@ -80,8 +77,8 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     ///     "session": "<session ID>"
     /// }
     /// ```
-    public static let recaptcha: MatrixLoginFlow = "m.login.recaptcha"
-    public static let oauth2: MatrixLoginFlow = "m.login.oauth2"
+    public static let recaptcha: MatrixLoginFlowType = "m.login.recaptcha"
+    public static let oauth2: MatrixLoginFlowType = "m.login.oauth2"
 
     /// Authentication is supported by authorising with an external single sign-on provider.
     ///
@@ -95,12 +92,12 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     ///    The homeserver then validates the response from the single sign-on provider and updates the user-interactive authentication session to mark the single sign-on stage has been completed. The browser is shown the fallback authentication completion page.
     ///
     ///    Once the flow has completed, the client retries the request with the session only, as above.
-    public static let sso: MatrixLoginFlow = "m.login.sso"
-    public static let email: MatrixLoginFlow = "m.login.email.identity"
-    public static let msisdn: MatrixLoginFlow = "m.login.msisdn"
-    public static let token: MatrixLoginFlow = "m.login.token"
-    public static let dummy: MatrixLoginFlow = "m.login.dummy"
-    public static let terms: MatrixLoginFlow = "m.login.terms"
+    public static let sso: MatrixLoginFlowType = "m.login.sso"
+    public static let email: MatrixLoginFlowType = "m.login.email.identity"
+    public static let msisdn: MatrixLoginFlowType = "m.login.msisdn"
+    public static let token: MatrixLoginFlowType = "m.login.token"
+    public static let dummy: MatrixLoginFlowType = "m.login.dummy"
+    public static let terms: MatrixLoginFlowType = "m.login.terms"
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -121,9 +118,100 @@ public struct MatrixLoginFlow: RawRepresentable, Codable, Equatable, Hashable {
     }
 }
 
-extension MatrixLoginFlow: ExpressibleByStringLiteral {
+extension MatrixLoginFlowType: ExpressibleByStringLiteral {
     public init(stringLiteral value: StringLiteralType) {
         rawValue = value
+    }
+}
+
+public struct MatrixLoginFlow {
+    var type: MatrixLoginFlowType
+    
+    var identiyProviders: [IdentityProvider]?
+    
+    var extraInfo: [String: AnyCodable]
+    
+    public struct IdentityProvider: Codable {
+        public init(brand: String? = nil, icon: String? = nil, id: String, name: String) {
+            self.brand = brand
+            self.icon = icon
+            self.id = id
+            self.name = name
+        }
+        
+        /// Optional UI hint for what kind of common SSO provider is being described in this ``IdentityProvider``.
+        ///
+        /// Matrix maintains a registry of identifiers in the
+        /// [matrix-spec repo](https://github.com/matrix-org/matrix-spec/blob/main/informal/idp-brands.md) to ensure clients and servers are aligned on major/common brands.
+        ///
+        /// Clients should prefer the brand over the icon, when both are provided.
+        /// Clients are not required to support any particular brand, including those in the registry, though are expected to be able to present any IdP based off the name/icon to the user regardless.
+        ///
+        /// Unregistered brands are permitted using the Common Namespaced Identifier Grammar, though excluding the namespace requirements. For example, examplesso is a valid brand which is not in the registry but still permitted. Servers should be mindful that clients might not support their unregistered brand usage as intended by the server.
+        public var brand: String?
+        
+        /// Optional MXC URI to provide an image/icon representing the IdP. Intended to be shown alongside the name if provided.
+        public var icon: String?
+        
+        /// Opaque string chosen by the homeserver, uniquely identifying the IdP from other IdPs the homeserver might support.
+        ///
+        /// Should be between 1 and 255 characters in length, containing unreserved characters under RFC 3986 (ALPHA DIGIT "-" / "." / "_" / "~"). Clients are not intended to parse or infer meaning from opaque strings.
+        public var id: String
+        
+        /// Human readable description for the ``IdentityProvider``, intended to be shown to the user.
+        public var name: String
+    }
+}
+
+extension MatrixLoginFlow: Codable {
+    private enum KnownCodingKeys: String, CodingKey, CaseIterable {
+        case type
+        case identiyProviders = "identity_providers"
+
+        static func doesNotContain(_ key: DynamicCodingKeys) -> Bool {
+            !Self.allCases.map(\.stringValue).contains(key.stringValue)
+        }
+    }
+
+    struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+
+        // not used here, but a protocol requirement
+        var intValue: Int?
+        init?(intValue _: Int) {
+            nil
+        }
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: KnownCodingKeys.self)
+        type = try container.decode(MatrixLoginFlowType.self, forKey: .type)
+        identiyProviders = try container.decodeIfPresent([IdentityProvider].self, forKey: .identiyProviders)
+
+        extraInfo = [:]
+        let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+
+        for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
+            let decoded = try extraContainer.decode(
+                AnyCodable.self,
+                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+            )
+            self.extraInfo[key.stringValue] = decoded
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: KnownCodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encodeIfPresent(identiyProviders, forKey: .identiyProviders)
+
+        var extraContainer = encoder.container(keyedBy: DynamicCodingKeys.self)
+        for (name, value) in extraInfo {
+            try extraContainer.encode(value, forKey: .init(stringValue: name)!)
+        }
     }
 }
 

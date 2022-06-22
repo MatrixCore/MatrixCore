@@ -13,7 +13,7 @@ public struct MatrixInteractiveAuth: MatrixResponse {
         flows: [MatrixInteractiveAuth.Flow],
         params: [String: AnyCodable],
         session: String? = nil,
-        completed: [MatrixLoginFlow]? = nil
+        completed: [MatrixLoginFlowType]? = nil
     ) {
         self.flows = flows
         self.params = params
@@ -32,14 +32,14 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     /// in subsequent attempts to authenticate in the same API call.
     public var session: String?
 
-    public var completed: [MatrixLoginFlow]?
+    public var completed: [MatrixLoginFlowType]?
 
     // MARK: Dynamic vars
 
     public var notCompletedStages: [Flow] {
         var ret: [Flow] = []
         for flow in flows {
-            var stages: [MatrixLoginFlow] = []
+            var stages: [MatrixLoginFlowType] = []
             for stage in flow.stages {
                 if !(completed?.contains(stage) ?? false) {
                     stages.append(stage)
@@ -51,7 +51,7 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     }
 
     /// Return the next stage, which did not yet complete, from the first login flow
-    public var nextStage: MatrixLoginFlow? {
+    public var nextStage: MatrixLoginFlowType? {
         notCompletedStages[0].stages[0]
     }
 
@@ -69,20 +69,20 @@ public struct MatrixInteractiveAuth: MatrixResponse {
 
     /// Test if the given login flow is supported by the home server.
     /// This returns true, the flow is contained in one or more stages.  This means the flow could be required.
-    public func isOptional(_ flow: MatrixLoginFlow) -> Bool {
+    public func isOptional(_ flow: MatrixLoginFlowType) -> Bool {
         flows.first { $0.stages.contains(flow) } != nil
     }
 
-    public func isOptional(notCompletedFlow flow: MatrixLoginFlow) -> Bool {
+    public func isOptional(notCompletedFlow flow: MatrixLoginFlowType) -> Bool {
         notCompletedStages.first { $0.stages.contains(flow) } != nil
     }
 
     /// Test if th given flow is required by every flow supported by the homeserver.
-    public func isRequierd(_ flow: MatrixLoginFlow) -> Bool {
+    public func isRequierd(_ flow: MatrixLoginFlowType) -> Bool {
         flows.allSatisfy { $0.stages.contains(flow) }
     }
 
-    public func isRequierd(notCompletedFlow flow: MatrixLoginFlow) -> Bool {
+    public func isRequierd(notCompletedFlow flow: MatrixLoginFlowType) -> Bool {
         notCompletedStages.allSatisfy { $0.stages.contains(flow) }
     }
 
@@ -96,14 +96,14 @@ public struct MatrixInteractiveAuth: MatrixResponse {
     }
 
     public struct LoginFlowWithParams {
-        public let flow: MatrixLoginFlow
+        public let flow: MatrixLoginFlowType
         public let params: AnyCodable?
     }
 }
 
 public extension MatrixInteractiveAuth {
     struct Flow: Codable {
-        public var stages: [MatrixLoginFlow] = []
+        public var stages: [MatrixLoginFlowType] = []
     }
 }
 
@@ -111,24 +111,24 @@ public extension MatrixInteractiveAuth {
 public struct MatrixInteractiveAuthResponse: Codable {
     public var session: String?
 
-    public var type: MatrixLoginFlow?
+    public var type: MatrixLoginFlowType?
 
     public var extraInfo: [String: AnyCodable]
 
-    public init(session: String? = nil, type: MatrixLoginFlow?, extraInfo: [String: AnyCodable] = [:]) {
+    public init(session: String? = nil, type: MatrixLoginFlowType?, extraInfo: [String: AnyCodable] = [:]) {
         self.session = session
         self.type = type
         self.extraInfo = extraInfo
     }
 
     public init(recaptchaResponse: String, session: String? = nil) {
-        type = MatrixLoginFlow.recaptcha
+        type = MatrixLoginFlowType.recaptcha
         self.session = session
         extraInfo = ["response": AnyCodable(stringLiteral: recaptchaResponse)]
     }
 
     public init(emailClientSecret clientSecret: String, emailSID sid: String, session: String? = nil) {
-        type = MatrixLoginFlow.email
+        type = MatrixLoginFlowType.email
         self.session = session
         extraInfo = [
             "threepid_creds": [
@@ -165,7 +165,7 @@ public extension MatrixInteractiveAuthResponse {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: KnownCodingKeys.self)
         session = try container.decodeIfPresent(String.self, forKey: .session)
-        type = try container.decode(MatrixLoginFlow.self, forKey: .type)
+        type = try container.decode(MatrixLoginFlowType.self, forKey: .type)
 
         extraInfo = [:]
         let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
