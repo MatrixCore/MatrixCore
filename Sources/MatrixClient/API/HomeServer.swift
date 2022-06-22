@@ -23,8 +23,15 @@ public struct MatrixHomeserver: Codable {
     }
 
     public init?(string: String) {
+        let urlString: String
+        if string.starts(with: "http") {
+            urlString = string
+        } else {
+            urlString = "https://" + string
+        }
+        
         guard
-            let components = URLComponents(string: string),
+            let components = URLComponents(string: urlString),
             components.host != nil
         else {
             return nil
@@ -53,6 +60,12 @@ public struct MatrixHomeserver: Codable {
         } else {
             url = self.url
         }
+    }
+    
+    @available(swift, introduced: 5.5)
+    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+    public init(resolve mxID: MatrixFullUserIdentifier, withUrlSession urlSession: URLSession = URLSession.shared) async throws {
+        try await self.init(resolve: mxID.domain, withUrlSession: urlSession)
     }
 
     public func path(_ path: String) -> URLComponents {

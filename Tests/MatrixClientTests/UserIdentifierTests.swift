@@ -31,4 +31,12 @@ final class UserIdentifierTests: XCTestCase {
         XCTAssertEqual(userIdentifier.rawValue, "localpart")
         XCTAssertNil(userIdentifier.FQMXID)
     }
+    
+    func testFullId() {
+        let userIdentifier = MatrixFullUserIdentifier(string: "@localpart:example.com")!
+        
+        XCTAssertEqual(userIdentifier.localpart, "localpart")
+        XCTAssertEqual(userIdentifier.domain, "example.com")
+        XCTAssertEqual(userIdentifier.FQMXID, "@localpart:example.com")
+    }
 }

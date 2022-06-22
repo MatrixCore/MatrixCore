@@ -125,14 +125,14 @@ extension MatrixLoginFlowType: ExpressibleByStringLiteral {
 }
 
 public struct MatrixLoginFlow {
-    var type: MatrixLoginFlowType
+    public var type: MatrixLoginFlowType
     
-    var identiyProviders: [IdentityProvider]?
+    public var identiyProviders: [IdentityProvider]?
     
-    var extraInfo: [String: AnyCodable]
+    public var extraInfo: [String: AnyCodable]
     
-    public struct IdentityProvider: Codable {
-        public init(brand: String? = nil, icon: String? = nil, id: String, name: String) {
+    public struct IdentityProvider: Codable, Identifiable {
+        public init(brand: Brand? = nil, icon: MatrixContentURL? = nil, id: String, name: String) {
             self.brand = brand
             self.icon = icon
             self.id = id
@@ -148,18 +148,71 @@ public struct MatrixLoginFlow {
         /// Clients are not required to support any particular brand, including those in the registry, though are expected to be able to present any IdP based off the name/icon to the user regardless.
         ///
         /// Unregistered brands are permitted using the Common Namespaced Identifier Grammar, though excluding the namespace requirements. For example, examplesso is a valid brand which is not in the registry but still permitted. Servers should be mindful that clients might not support their unregistered brand usage as intended by the server.
-        public var brand: String?
+        public var brand: Brand?
         
-        /// Optional MXC URI to provide an image/icon representing the IdP. Intended to be shown alongside the name if provided.
-        public var icon: String?
+        /// Optional MXC URI to provide an image/icon representing the ``IdentityProvider``. Intended to be shown alongside the name if provided.
+        public var icon: MatrixContentURL?
         
-        /// Opaque string chosen by the homeserver, uniquely identifying the IdP from other IdPs the homeserver might support.
+        /// Opaque string chosen by the homeserver, uniquely identifying the ``IdentityProvider`` from other ``IdentityProvider``s the homeserver might support.
         ///
         /// Should be between 1 and 255 characters in length, containing unreserved characters under RFC 3986 (ALPHA DIGIT "-" / "." / "_" / "~"). Clients are not intended to parse or infer meaning from opaque strings.
         public var id: String
         
         /// Human readable description for the ``IdentityProvider``, intended to be shown to the user.
         public var name: String
+        
+        @frozen
+        public struct Brand: RawRepresentable, Codable, Identifiable, ExpressibleByStringLiteral, CustomStringConvertible, Equatable, Hashable {
+            public init?(rawValue: String) {
+                self.rawValue = rawValue
+            }
+            
+            public init(stringLiteral value: StringLiteralType) {
+                self.rawValue = value
+            }
+        
+            public var rawValue: String
+            
+            public var id: String {
+                rawValue
+            }
+            
+            public var description: String {
+                rawValue
+            }
+            
+            // MARK: Brand Registry
+            /// Apple
+            ///
+            /// Suitable for "Sign in with Apple": see
+            /// [https://appleid.apple.com/signinwithapple/button](https://appleid.apple.com/signinwithapple/button).
+            public static let apple: Self = "apple"
+            
+            /// Facebok
+            ///
+            /// "Continue with Facebook": see https://developers.facebook.com/docs/facebook-login/web/login-button/.
+            public static let facebook: Self = "facebook"
+            
+            /// GitHub
+            ///
+            /// Logos available at https://github.com/logos.
+            public static let github: Self = "github"
+            
+            /// GitLab
+            ///
+            /// Logos available at https://about.gitlab.com/press/press-kit/.
+            public static let gitlab: Self = "gitlab"
+            
+            /// Google
+            ///
+            /// Suitable for "Google Sign-In": see https://developers.google.com/identity/branding-guidelines.
+            public static let google: Self = "google"
+            
+            /// Twitter
+            ///
+            /// Suitable for "Log in with Twitter": see https://developer.twitter.com/en/docs/authentication/guides/log-in-with-twitter#tab1.
+            public static let twitter: Self = "twitter"
+        }
     }
 }
 
