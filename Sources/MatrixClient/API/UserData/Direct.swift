@@ -14,20 +14,8 @@ public struct MatrixDirectAccountData: MatrixAccountData {
 }
 
 extension MatrixDirectAccountData: Codable {
-    private struct DynamicCodingKeys: CodingKey {
-        var stringValue: String
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-
-        var intValue: Int?
-        init?(intValue _: Int) {
-            nil
-        }
-    }
-
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let container = try decoder.container(keyedBy: MatrixDynamicCodingKeys.self)
 
         for key in container.allKeys {
             let decoded = try container.decode([String].self, forKey: key)
@@ -36,7 +24,7 @@ extension MatrixDirectAccountData: Codable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var container = encoder.container(keyedBy: MatrixDynamicCodingKeys.self)
         for (name, value) in users {
             try container.encode(value, forKey: .init(stringValue: name)!)
         }

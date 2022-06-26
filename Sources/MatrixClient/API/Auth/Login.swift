@@ -223,26 +223,9 @@ public struct MatrixLoginFlow {
 }
 
 extension MatrixLoginFlow: Codable {
-    private enum KnownCodingKeys: String, CodingKey, CaseIterable {
+    private enum KnownCodingKeys: String, MatrixKnownCodingKeys {
         case type
         case identiyProviders = "identity_providers"
-
-        static func doesNotContain(_ key: DynamicCodingKeys) -> Bool {
-            !Self.allCases.map(\.stringValue).contains(key.stringValue)
-        }
-    }
-
-    struct DynamicCodingKeys: CodingKey {
-        var stringValue: String
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-
-        // not used here, but a protocol requirement
-        var intValue: Int?
-        init?(intValue _: Int) {
-            nil
-        }
     }
     
     public init(from decoder: Decoder) throws {
@@ -251,12 +234,12 @@ extension MatrixLoginFlow: Codable {
         identiyProviders = try container.decodeIfPresent([IdentityProvider].self, forKey: .identiyProviders)
 
         extraInfo = [:]
-        let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let extraContainer = try decoder.container(keyedBy: MatrixDynamicCodingKeys.self)
 
         for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
             let decoded = try extraContainer.decode(
                 AnyCodable.self,
-                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+                forKey: MatrixDynamicCodingKeys(stringValue: key.stringValue)!
             )
             self.extraInfo[key.stringValue] = decoded
         }
@@ -267,7 +250,7 @@ extension MatrixLoginFlow: Codable {
         try container.encode(type, forKey: .type)
         try container.encodeIfPresent(identiyProviders, forKey: .identiyProviders)
 
-        var extraContainer = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var extraContainer = encoder.container(keyedBy: MatrixDynamicCodingKeys.self)
         for (name, value) in extraInfo {
             try extraContainer.encode(value, forKey: .init(stringValue: name)!)
         }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AnyCodable
 
 /// HTTP method to be used by ``MatrixClient/MatrixRequest``.
 public enum HttpMethod: String, CaseIterable {
@@ -219,3 +220,30 @@ public extension MatrixClient {
 }
 
 public struct MatrixEmptyResponse: MatrixResponse {}
+
+
+
+
+// MARK: - Codable
+
+public struct MatrixDynamicCodingKeys: CodingKey {
+    public var stringValue: String
+    public init?(stringValue: String) {
+        self.stringValue = stringValue
+    }
+    
+    public var intValue: Int?
+    public init?(intValue: Int) {
+        nil
+    }
+}
+
+public protocol MatrixKnownCodingKeys: CodingKey, CaseIterable {
+    
+}
+
+public extension MatrixKnownCodingKeys {
+    static func doesNotContain(_ key: MatrixDynamicCodingKeys) -> Bool {
+        !Self.allCases.map(\.stringValue).contains(key.stringValue)
+    }
+}

@@ -140,27 +140,12 @@ public struct MatrixInteractiveAuthResponse: Codable {
 }
 
 public extension MatrixInteractiveAuthResponse {
-    private enum KnownCodingKeys: String, CodingKey, CaseIterable {
+    private enum KnownCodingKeys: String, MatrixKnownCodingKeys {
         case session
         case type
 
-        static func doesNotContain(_ key: DynamicCodingKeys) -> Bool {
-            !Self.allCases.map(\.stringValue).contains(key.stringValue)
-        }
     }
 
-    internal struct DynamicCodingKeys: CodingKey {
-        var stringValue: String
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-        }
-
-        // not used here, but a protocol requirement
-        var intValue: Int?
-        init?(intValue _: Int) {
-            nil
-        }
-    }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: KnownCodingKeys.self)
@@ -168,12 +153,12 @@ public extension MatrixInteractiveAuthResponse {
         type = try container.decode(MatrixLoginFlowType.self, forKey: .type)
 
         extraInfo = [:]
-        let extraContainer = try decoder.container(keyedBy: DynamicCodingKeys.self)
+        let extraContainer = try decoder.container(keyedBy: MatrixDynamicCodingKeys.self)
 
         for key in extraContainer.allKeys where KnownCodingKeys.doesNotContain(key) {
             let decoded = try extraContainer.decode(
                 AnyCodable.self,
-                forKey: DynamicCodingKeys(stringValue: key.stringValue)!
+                forKey: MatrixDynamicCodingKeys(stringValue: key.stringValue)!
             )
             self.extraInfo[key.stringValue] = decoded
         }
@@ -184,7 +169,7 @@ public extension MatrixInteractiveAuthResponse {
         try container.encodeIfPresent(session, forKey: .session)
         try container.encodeIfPresent(type?.rawValue, forKey: .type)
 
-        var extraContainer = encoder.container(keyedBy: DynamicCodingKeys.self)
+        var extraContainer = encoder.container(keyedBy: MatrixDynamicCodingKeys.self)
         for (name, value) in extraInfo {
             try extraContainer.encode(value, forKey: .init(stringValue: name)!)
         }
