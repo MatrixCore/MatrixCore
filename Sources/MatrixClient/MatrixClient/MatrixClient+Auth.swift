@@ -115,20 +115,27 @@ public extension MatrixClient {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func login(
         token: Bool = false,
-        username: String,
+        username: String? = nil,
         password: String,
         displayName: String? = nil,
         deviceId: String? = nil
     ) async throws -> MatrixLogin {
         let flow: MatrixLoginFlowType
+        let identifier: MatrixLoginUserIdentifier?
         if token {
             flow = .token
+            identifier = nil
         } else {
             flow = .password
+            guard let username else {
+                throw MatrixCommonErrorCode.missingParam
+            }
+            identifier = .user(id: username)
         }
+        
         var request = MatrixLoginRequest(
             type: flow.rawValue,
-            identifier: MatrixLoginUserIdentifier.user(id: username),
+            identifier: identifier,
             deviceId: deviceId,
             initialDeviceDisplayName: displayName
         )

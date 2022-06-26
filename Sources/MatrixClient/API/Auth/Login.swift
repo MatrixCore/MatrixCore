@@ -125,6 +125,12 @@ extension MatrixLoginFlowType: ExpressibleByStringLiteral {
 }
 
 public struct MatrixLoginFlow {
+    public init(type: MatrixLoginFlowType, identiyProviders: [MatrixLoginFlow.IdentityProvider]? = nil, extraInfo: [String : AnyCodable] = [:]) {
+        self.type = type
+        self.identiyProviders = identiyProviders
+        self.extraInfo = extraInfo
+    }
+    
     public var type: MatrixLoginFlowType
     
     public var identiyProviders: [IdentityProvider]?

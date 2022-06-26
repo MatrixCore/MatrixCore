@@ -14,6 +14,8 @@ import OSLog
 public protocol MatrixStore {
     // MARK: - Account Info
 
+    static var extraKeychainArguments: [String: Any] { get }
+    
     /// Type for Account Informations.
     associatedtype AccountInfo: MatrixStoreAccountInfo
     //associatedtype RoomState: MatrixStoreRoomState

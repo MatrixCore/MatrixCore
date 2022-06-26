@@ -38,7 +38,7 @@ public extension MatrixStoreAccountInfo {
         var dict = dict
         dict[kSecClass as String] = kSecClassGenericPassword
         dict[kSecAttrAccount as String] = mxID.FQMXID
-        //dict[kSecUseDataProtectionKeychain as String] = true
+        dict[kSecUseDataProtectionKeychain as String] = true
         if dict[kSecAttrLabel as String] == nil {
             dict[kSecAttrLabel as String] = MXkSecAttrLabel
         }
@@ -73,6 +73,10 @@ public extension MatrixStoreAccountInfo {
 
     /// Save the ``accessToken`` to keychain, using the accountID data as identifier.
     func saveToKeychain(extraKeychainArguments: [String: Any] = [:]) throws {
+        do {
+            try self.deleteFromKeychain(extraKeychainArguments: extraKeychainArguments)
+        }
+        
         guard let accessToken = self.accessToken?.data(using: .utf8)
         else {
             throw MatrixErrorCode.NotFound
@@ -133,8 +137,15 @@ public extension MatrixStore {
     func getAccounts() async throws -> [MatrixCore<Self>] {
         let accounts = try await getAccountInfos()
 
-        return accounts.map { MatrixCore(store: self, account: $0) }
-        // Init MatrixCore.client somehow?
+        var cores: [MatrixCore<Self>] = []
+        
+        for account in accounts {
+            var account = account
+            try account.loadAccessToken(extraKeychainArguments: Self.extraKeychainArguments)
+            cores.append(MatrixCore(store: self, account: account))
+        }
+        
+        return cores
     }
 
     /// Create ``MatrixCore`` instance for the given MatrixUser ID with data from the store.
